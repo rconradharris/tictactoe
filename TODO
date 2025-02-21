@@ -1,0 +1,10 @@
+- Use uv [DONE]
+- Use mypy typechecking [DONE]
+- Create board and game model [DONE]
+- Save move history [DONE]
+- Define PGN equivalent for tic-tac-toe
+    - algebraic tic-tac-toe: at3
+
+- Rewrite tests using this format
+
+- Successfully play tic tac toe
