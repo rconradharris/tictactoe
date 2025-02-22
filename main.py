@@ -79,15 +79,24 @@ def test_at3_case(path: str) -> None:
 
 
 def test_at3_cases() -> None:
-    TEST_CASES_PATH = 'tests/cases'
-    filenames = os.listdir(TEST_CASES_PATH)
-    filenames.sort()
-    for filename in filenames:
-        if not filename.endswith('.ttt'):
-            continue
+    TESTS_PATH = 'tests'
 
-        path = os.path.join(TEST_CASES_PATH, filename)
-        test_at3_case(path)
+    test_root = TESTS_PATH
+
+    # Collect test files
+    test_files = []
+    for dirpath, dirnames, filenames in os.walk(test_root):
+        for filename in filenames:
+            path = os.path.join(dirpath, filename)
+            test_files.append(path)
+
+    # Sort for stability
+    test_files.sort()
+
+    # Run tests
+    for path in test_files:
+        if path.endswith('.ttt'):
+            test_at3_case(path)
 
 
 def main():
