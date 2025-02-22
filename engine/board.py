@@ -285,7 +285,7 @@ class Board:
         pretty_tbl_str = "\n".join(pretty_tbl)
         return pretty_tbl_str
 
-    def _top_empty_row_for_column(self, col: int) -> int:
+    def top_empty_row_for_column(self, col: int) -> int:
         """Return the row for the 'top' empty cell in a column
 
         Returns 0 if there are no empty cells in column
@@ -299,7 +299,7 @@ class Board:
         return 0 
 
     def _check_column_stack(self, m: Move) -> None:
-        row = self._top_empty_row_for_column(m.col)
+        row = self.top_empty_row_for_column(m.col)
         if m.row != row:
             raise IllegalMove(f"move must stack ({m=})")
 
@@ -330,7 +330,17 @@ class Board:
         r[m.col] = m.piece
 
     @classmethod
-    def parse_algebraic_cell(cls, token: str) -> Cell:
+    def parse_column_letter(cls, col_letter: str) -> int:
+        """Returns index associated with a given column letter
+
+        For example, 'a' return 0, 'b' returns 1, etc...
+        """
+        col_letter = col_letter.lower()
+        col_idx = ord(col_letter) - ord('a')
+        return col_idx
+
+    @classmethod
+    def parse_cell(cls, token: str) -> Cell:
         """Token is like 'a1' """
         match = RE_MOVE_COORD.match(token)
         if not match:
@@ -338,9 +348,7 @@ class Board:
 
         col_letter, row_num_str = match.groups()
 
-        col_letter = col_letter.lower()
-
-        col_idx = ord(col_letter) - ord('a')
+        col_idx = cls.parse_column_letter(col_letter)
 
         try:
             row_num = int(row_num_str)
