@@ -18,6 +18,7 @@ class Game:
         self.state: GameState = GameState.INIT
         self.result: Result = Result.UNFINISHED
         self.move_history: list[Move] = []
+        self.board.reset()
 
     def _end_turn(self) -> None:
         if self.cur_player == Player.P1:

@@ -30,15 +30,14 @@ class Board:
         self.cols: int = cols
         self.win_count: int = win_count
         self.placement_rule: PlacementRule = placement_rule
+        self.reset()
 
-        self.tbl: StateTable = self._init_tbl(rows, cols)
-
-    def _init_tbl(self, rows: int, cols: int) -> StateTable:
+    def reset(self) -> None:
         tbl = []
-        for _ in range(rows):
-            row = [Piece._ for _ in range(cols)]
+        for _ in range(self.rows):
+            row = [Piece._ for _ in range(self.cols)]
             tbl.append(row)
-        return tbl
+        self.tbl = tbl
 
     def full(self) -> bool:
         """Return True if the board is full of pieces"""

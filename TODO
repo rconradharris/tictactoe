@@ -21,3 +21,6 @@
     - .ttt -> TIC_TAC_TOE [DONE]
     - .c4 -> CONNECT_FOUR [DONE]
 - Replace Cat Game with Draw since connect four is supported [DONE]
+- Add Board.reset(), call in Game.reset() [DONE]
+- Add at3.format()
+- Add interactive command to write at3 file
