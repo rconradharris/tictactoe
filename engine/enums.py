@@ -2,8 +2,8 @@ from enum import Enum, auto
 
 
 class Player(Enum):
-    P1 = 1
-    P2 = 2
+    P1 = auto()
+    P2 = auto()
 
 
 class Result(Enum):

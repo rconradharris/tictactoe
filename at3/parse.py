@@ -1,23 +1,27 @@
 import re
+from typing import Tuple
 
 from at3.at3_object import AT3Object
 from at3.exceptions import (
     ParseException,
+    ParseStateException,
     RequiredFieldMissing,
     UnknownFieldException,
 )
-from at3.enums import KnownField
+from at3.enums import KnownField, ParseState
 
 from engine.enums import Mark, Player, Result
+from engine.move import Move
 
 
-RE_META = re.compile(r'\s*\[(\w+)\s+\"(.+)\"\]\s*')
+RE_METADATA_LINE = re.compile(r'\s*\[(\w+)\s+\"(.+)\"\]\s*')
+RE_MOVE_COORD = re.compile(r'([a-zA-Z])(\d)')
 
-def _parse_meta(obj: AT3Object, line: str):
+def _parse_metadata_line(obj: AT3Object, line: str):
     if not line.endswith(']'):
         raise ParseException("meta line must end with ]")
 
-    match = RE_META.match(line)
+    match = RE_METADATA_LINE.match(line)
     if not match:
         raise ParseException(f"syntax error in meta line {line=}")
 
@@ -105,22 +109,155 @@ def _parse_grid(obj: AT3Object, value: str) -> None:
     obj.cols = cols
 
 
-def _check_required_fields(obj: AT3Object) -> None:
-    if obj.player1_choice == Mark._:
-        raise RequiredFieldMissing("Player1Choice must be specified")
-
-
 def parse(at3_data: str) -> AT3Object:
-    obj = AT3Object()
+    """Convenience function to parse"""
+    parser = Parser()
+    return parser.parse(at3_data)
 
-    lines = at3_data.split("\n")
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
 
-        if line.startswith("["):
-            _parse_meta(obj, line)
+class Parser:
 
-    _check_required_fields(obj)
-    return obj
+    def __init__(self) -> None:
+        self.state: ParseState = ParseState.INIT
+        self.cur_mark: Mark = Mark._
+
+    def _check_state(self, allowed: list[ParseState], msg: str) -> None:
+        state = self.state
+        if state in allowed:
+            return
+
+        raise ParseStateException(f"{msg} ({state=})")
+
+    def _check_metadata_state(self) -> None:
+        """Ensure we're allowed to parse a metadata line"""
+        allowed = [ParseState.INIT, ParseState.METADATA]
+        msg = "cannot parse metadata in this state"
+
+        self._check_state(allowed, msg)
+
+    def _check_move_state(self, obj: AT3Object) -> None:
+        """Ensure we're allowed to parse a move line"""
+        self._check_player_choice_specified(obj)
+
+        allowed = [ParseState.INIT, ParseState.METADATA,
+                   ParseState.MOVE_NUMBER]
+        msg = "cannot parse moves in this state"
+
+        self._check_state(allowed, msg)
+
+    def _parse_move_number(self, token: str) -> int:
+        """Token is like '1.' """
+        if '.' not in token:
+            raise ParseException(f"move number must have a '.' ({token=})")
+
+        move_num_str = token.replace('.', '')
+
+        try:
+            move_num = int(move_num_str)
+        except ValueError:
+            raise ParseException(f"move number must be a valid number ({token=})")
+
+        if move_num < 1:
+            raise ParseException(f"move number must start at 1 ({token=})")
+
+        return move_num
+
+    def _check_move_number_monotonic(
+            self, prev_move_num: int, move_num: int, token: str) -> None:
+        if (move_num - prev_move_num) != 1:
+            raise ParseException(f"move number must increase by 1 each time ({token=})")
+
+    def _parse_move_coordinate(self, obj: AT3Object, token: str) -> Tuple[int, int]:
+        """Token is like 'a1' """
+        match = RE_MOVE_COORD.match(token)
+        if not match:
+            raise ParseException(f"syntax error in move coordinate {token=}")
+
+        col_letter, row_num_str = match.groups()
+
+        col_letter = col_letter.lower()
+
+        col_idx = ord(col_letter) - ord('a')
+
+        try:
+            row_num = int(row_num_str)
+        except ValueError:
+            raise ParseException(f"row number must be a number {token=}")
+
+        row_idx = row_num - 1
+
+        return (row_idx, col_idx)
+
+    def _next_mark(self) -> None:
+        """Advance to the next mark, X -> O, O -> X"""
+        cur_mark = self.cur_mark
+        if cur_mark == Mark.X:
+            self.cur_mark = Mark.O
+        elif cur_mark == Mark.O:
+            self.cur_mark = Mark.X
+        else:
+            raise Exception(f"unknown mark ({cur_mark=})")
+
+    def _parse_move_line(self, obj: AT3Object, line: str) -> None:
+        """
+        1. a1 2. b2
+        """
+        tokens = line.split(" ")
+
+        prev_move_num = 0
+        for token in tokens:
+            if self.state == ParseState.MOVE_NUMBER:
+                move_num = self._parse_move_number(token)
+
+                self._check_move_number_monotonic(
+                        prev_move_num, move_num, token)
+
+                prev_move_num = move_num
+
+                self.state = ParseState.MOVE_COORDINATE
+            elif self.state == ParseState.MOVE_COORDINATE:
+                row_idx, col_idx = self._parse_move_coordinate(obj, token)
+
+                move = Move(row_idx, col_idx, self.cur_mark)
+                obj.moves.append(move)
+
+                self._next_mark()
+
+                self.state = ParseState.MOVE_NUMBER
+
+    def _check_player_choice_specified(self, obj: AT3Object) -> None:
+        if obj.player1_choice == Mark._:
+            raise RequiredFieldMissing("Player1Choice must be specified")
+
+    def _check_required_fields(self, obj: AT3Object) -> None:
+        self._check_player_choice_specified(obj)
+
+    def parse(self, at3_data: str) -> AT3Object:
+        if self.state != ParseState.INIT:
+            raise ParseStateException("must parse from an initialized state")
+
+        obj = AT3Object()
+
+        lines = at3_data.split("\n")
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            if line.startswith("["):
+                self._check_metadata_state()
+                self.state = ParseState.METADATA
+
+                _parse_metadata_line(obj, line)
+            else:
+                if self.cur_mark == Mark._:
+                    self.cur_mark = obj.player1_choice
+
+                self._check_move_state(obj)
+                self.state = ParseState.MOVE_NUMBER
+
+                self._parse_move_line(obj, line)
+
+        self.state = ParseState.DONE
+        self._check_required_fields(obj)
+        return obj

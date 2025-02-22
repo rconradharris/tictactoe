@@ -39,6 +39,7 @@ P.S. Yes this is a joke... ;-)
 from dataclasses import dataclass, field
 
 from engine.enums import Mark, Result
+from engine.move import Move
 
 
 @dataclass
@@ -75,3 +76,5 @@ class AT3Object:
 
     def set_field(self, field: str, value: str) -> None:
         self._fields[field] = value
+
+    moves: list[Move] = field(default_factory=list)

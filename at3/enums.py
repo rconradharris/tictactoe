@@ -3,6 +3,14 @@ from enum import Enum, auto
 from at3.exceptions import UnknownFieldException
 
 
+class ParseState(Enum):
+    INIT = auto()
+    METADATA = auto()
+    MOVE_NUMBER = auto()
+    MOVE_COORDINATE = auto()
+    DONE = auto()
+
+
 class KnownField(Enum):
     """These are fields defined by the spec. Other fields can be included, but
     they'll just be treated as arbitrary strings

@@ -164,7 +164,7 @@ def test_at3():
 [Grid "3x3"]
 [Player1Choice "X"]
     
-1. a1
+1. a1 2. b2
     """
     obj = parse(at3_data)
     print(obj)
