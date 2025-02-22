@@ -1,6 +1,7 @@
 import re
 import string
 
+from engine.dim import within_bounds
 from engine.exceptions import CellBoundsException, IllegalMove
 from engine.enums import Piece
 from engine.move import Move
@@ -73,9 +74,10 @@ class Board:
     @classmethod
     def cell_in_bounds(self, cell: Cell, sz: BoardSize) -> bool:
         """Returns True if the cell is within the bounds of the board"""
-        row, col = cell
-        rows, cols = sz
-        return (0 <= row < rows) and (0 <= col < cols)
+        coords = list(cell)
+        upper_bounds = list(sz)
+        lower_bounds = [0 for _ in upper_bounds]
+        return within_bounds(coords, lower_bounds, upper_bounds)
 
     def pretty(self, coords=False) -> str:
         """
