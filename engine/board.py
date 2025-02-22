@@ -6,7 +6,7 @@ from engine.exceptions import IllegalMove
 from engine.enums import Piece
 from engine.move import Move
 from engine.placement_rule import PlacementRule
-from engine.typedefs import Cell, StateTable
+from engine.typedefs import Cell
 
 RE_MOVE_COORD = re.compile(r'([a-zA-Z])(\d)')
 
