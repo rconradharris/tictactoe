@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import os
+import sys
 
 from at3.at3_object import AT3Object
 from at3.file_extensions import valid_file_extension
@@ -87,8 +88,23 @@ def run_tests(root: str) -> None:
 
 
 
+def show_help() -> None:
+    print("""\
+GAME CHOICES
+    T3 - Tic Tac Toe
+    C4 - Connect Four
+
+COMMANDS
+    . - show board
+    ? - display help
+
+MOVE SYNTAX
+    <column-letter><row-number> (ex: 'a1')""")
+
+
 def game_loop(g: Game) -> None:
     CMD_SHOW_BOARD = "."
+    CMD_HELP = "?"
 
     show_board(g)
 
@@ -113,6 +129,9 @@ def game_loop(g: Game) -> None:
 
         if cell_str == CMD_SHOW_BOARD:
             show_board(g)
+            continue
+        elif cell_str == CMD_HELP:
+            show_help()
             continue
 
         try:
@@ -168,8 +187,18 @@ def interactive() -> None:
 
 
 def main():
-    #interactive()
-    run_tests('tests')
+    if len(sys.argv) < 2:
+        print("usage: main.py <play|test>", file=sys.stderr)
+        sys.exit(1)
+
+    cmd = sys.argv[1]
+    if cmd == "play":
+        interactive()
+    elif cmd == "test":
+        run_tests('tests')
+    else:
+        print(f"error: unknown command '{cmd}'", file=sys.stderr)
+        sys.exit(1)
     #run_tests('tests/c4')
     #run_test("tests/c4/000_p1_row_win.c4")
     

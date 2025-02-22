@@ -1,7 +1,10 @@
-all: check run
+all: check play
 
-run:
-	uv run main.py
+play:
+	uv run main.py play
+
+test:
+	uv run main.py test
 
 check:
 	uv run ruff check
