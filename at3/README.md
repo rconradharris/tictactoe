@@ -35,8 +35,8 @@ File Extension
 
 AT3 file use the '.at3' extension as a default. This supports arbitrary m,n,k style games.
 
-You can use '.ttt' as a short-hand for tic-tac-toe and this will
-apply those game parameters.
+You can use '.t3' as a short-hand for tic-tac-toe and this will apply those
+game parameters.
 
 Likewise, you can use '.c4' as a short-hand for Connect Four.
 
