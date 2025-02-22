@@ -47,16 +47,12 @@ class Board:
     def win(self) -> bool:
         """Return True if a winning sequence is present"""
         # - direction
-        for row_idx in range(self.rows):
-            row_seq = self.tbl[row_idx]
-            if self._winning_sequence(row_seq):
-                return True
+        if self._row_win():
+            return True
 
         # | direction
-        for col_idx in range(self.cols):
-            col_seq = [row[col_idx] for row in self.tbl]
-            if self._winning_sequence(col_seq):
-                return True
+        if self._col_win():
+            return True
 
         # / direction
         if self._slash_win():
@@ -73,7 +69,8 @@ class Board:
         row, col = cell
         return (0 <= row < self.rows) and (0 <= col < self.cols)
 
-    def _diagonal_cells(self, cell, row_delta: int, col_delta: int) -> Generator[Cell]:
+    def _cell_sequence(self, cell, row_delta: int, col_delta: int) -> Generator[Cell]:
+        """Yield cells in a direction specified by row_delta and col_delta"""
         row, col = cell
 
         while True:
@@ -85,12 +82,28 @@ class Board:
             row += row_delta
             col += col_delta
 
+    def _row_cells(self, cell) -> Generator[Cell]:
+        """Yield cells in the - direction starting at (row, col)
+
+        Row direction fixes row and increments column.
+        """
+        for cell in self._cell_sequence(cell, row_delta=0, col_delta=1):
+            yield cell
+
+    def _col_cells(self, cell) -> Generator[Cell]:
+        """Yield cells in the | direction starting at (row, col)
+
+        Row direction increments row and fixes column.
+        """
+        for cell in self._cell_sequence(cell, row_delta=1, col_delta=0):
+            yield cell
+
     def _slash_cells(self, cell) -> Generator[Cell]:
         """Yield cells in the / direction starting at (row, col)
 
         Slashes decrement row and increment column.
         """
-        for cell in self._diagonal_cells(cell, row_delta=-1, col_delta=1):
+        for cell in self._cell_sequence(cell, row_delta=-1, col_delta=1):
             yield cell
 
     def _backslash_cells(self, cell) -> Generator[Cell]:
@@ -98,8 +111,36 @@ class Board:
 
         Backslashes increment row and increment column.
         """
-        for cell in self._diagonal_cells(cell, row_delta=1, col_delta=1):
+        for cell in self._cell_sequence(cell, row_delta=1, col_delta=1):
             yield cell
+
+    def _row_win(self) -> bool:
+        for ref_row in range(self.rows):
+            seq = []
+            for row, col in self._row_cells((ref_row, 0)):
+                #print(f"{row=} {col=}")
+                piece = self.tbl[row][col]
+                seq.append(piece)
+
+            #print(f"{seq=}")
+            if self._winning_sequence(seq):
+                return True
+
+        return False
+
+    def _col_win(self) -> bool:
+        for ref_col in range(self.cols):
+            seq = []
+            for row, col in self._col_cells((0, ref_col)):
+                #print(f"{row=} {col=}")
+                piece = self.tbl[row][col]
+                seq.append(piece)
+
+            #print(f"{seq=}")
+            if self._winning_sequence(seq):
+                return True
+
+        return False
 
     def _slash_win(self) -> bool:
         # / down the rows
