@@ -12,7 +12,16 @@ RE_MOVE_COORD = re.compile(r'([a-zA-Z])(\d)')
 
 class Board:
     """
-    Implements a m,n,k-game
+    Implements an abstract m,n,k-game like tic-tac-toe or Connect Four.
+
+    By abstract, it's meant that notions like pieces falling due to gravity,
+    like in Connect Four for example, aren't considered. To put it another
+    way, the game can be imagined being played horizontally and pieces are
+    placed anywhere where the player commands.
+
+    Of course, the rules of the game are still respected so if a user places a
+    piece in the middle of a Connect Four board, for example, an IllegalMove
+    exception will be generated to ensure the integrity of the game.
     """
 
     def __init__(self,

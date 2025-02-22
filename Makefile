@@ -1,4 +1,4 @@
-all: check play
+all: play
 
 play:
 	uv run main.py play
