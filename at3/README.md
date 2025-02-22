@@ -10,10 +10,10 @@ Arbitrary metadata can be included using brackets.
 Grid Size
 =========
 
-To play 4x4 tic-tac-toe, use `[Grid "4x4"]`.
+To specify an arbtrary grid size, for example 5x4, use `[Grid "5x4"]`.
 
-Make sure to use the `.at3` extension for the filename since `.ttt` is reserved
-for proper 3x3 tic-tac-toe.
+Make sure to use the `.at3` extension for the filename since `.t3` is reserved
+for standard 3x3 tic-tac-toe.
 
 Required Fields
 ===============
@@ -43,23 +43,22 @@ Likewise, you can use '.c4' as a short-hand for Connect Four.
 Sample 
 ======
 
-[Event "World Tic-Tac-Toe Championships"]
-[Site "Los Angeles, CA, USA"]
-[Date "2025.02.21"]
-[Game "TicTacToe"]
-[Player1 "Alice Kasparov"]
-[Player2 "Bob Carlsen"]
-[Result "Cat Game"]
-[Player1Elo "3000"]
-[Player2Elo "3000"]
-[TimeControl "Whenever"]
-[PlacementRule "Anywhere"]
-[Grid "3x3"]
-[WinCount "3"]
-[Player1Choice "X"]
+```
+    [Event "World Tic-Tac-Toe Championships"]
+    [Site "Los Angeles, CA, USA"]
+    [Date "2025.02.21"]
+    [Game "TicTacToe"]
+    [Player1 "Alice Kasparov"]
+    [Player2 "Bob Carlsen"]
+    [Result "Cat Game"]
+    [Player1Elo "3000"]
+    [Player2Elo "3000"]
+    [TimeControl "Whenever"]
+    [PlacementRule "Anywhere"]
+    [Grid "3x3"]
+    [WinCount "3"]
+    [Player1Choice "X"]
 
-1. a1 2. b2
-3. c2 ...
-
-
-P.S. Yes this is a joke... or is it?
+    1. a1 2. b2
+    3. c2 ...
+```
