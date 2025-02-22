@@ -33,6 +33,7 @@ Sample
 [Player1Elo "3000"]
 [Player2Elo "3000"]
 [TimeControl "Whenever"]
+[PlacementRule "Anywhere"]
 [Grid "3x3"]
 [WinCount "3"]
 [Player1Choice "X"]

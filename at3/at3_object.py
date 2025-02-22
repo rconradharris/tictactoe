@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from engine.enums import Piece, Result
+from engine.enums import PlacementRule, Piece, Result
 from engine.move import Move
 
 
@@ -23,6 +23,8 @@ class AT3Object:
     player2_elo: int = 0
 
     time_control: str = ""
+
+    placement_rule: PlacementRule = PlacementRule.ANYWHERE
 
     # Grid field
     rows: int = 3

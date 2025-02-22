@@ -1,21 +1,30 @@
 from engine.enums import Piece
 from engine.exceptions import IllegalMove
+from engine.typedefs import Cell
+
 
 class Move:
-    row: int
-    col: int
+    cell: Cell
     piece: Piece
 
-    def __init__(self, row: int, col: int, piece: Piece):
-        if row < 0:
+    def __init__(self, cell: Cell, piece: Piece):
+        if cell[0] < 0:
             raise IllegalMove("row cannot be negative")
-        self.row = row
-
-        if col < 0:
+        if cell[1] < 0:
             raise IllegalMove("col cannot be negative")
-        self.col = col
+
+        self.cell = cell
         self.piece = piece
+
+    @property
+    def row(self) -> int:
+        return self.cell[0]
+
+    @property
+    def col(self) -> int:
+        return self.cell[1]
 
     def __repr__(self) -> str:
         """Provide a more concise repr than dataclass default"""
-        return f"Move({self.row}, {self.col}, {self.piece.pretty()})"
+        row, col = self.cell
+        return f"Move({row}, {col}, {self.piece.pretty()})"

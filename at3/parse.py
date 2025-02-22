@@ -1,5 +1,4 @@
 import re
-from typing import Tuple
 
 from at3.at3_object import AT3Object
 from at3.exceptions import (
@@ -10,8 +9,9 @@ from at3.exceptions import (
 )
 from at3.enums import KnownField, ParseState
 
-from engine.enums import Player, Piece, Result
+from engine.enums import PlacementRule, Player, Piece, Result
 from engine.move import Move
+from engine.typedefs import Cell
 
 
 RE_METADATA_LINE = re.compile(r'\s*\[(\w+)\s+\"(.+)\"\]\s*')
@@ -57,6 +57,8 @@ def _parse_known_field(obj: AT3Object, f: KnownField, value: str) -> None:
         _parse_player_elo(obj, Player.P2, value)
     elif f == KnownField.TIME_CONTROL:
         obj.time_control = value
+    elif f == KnownField.PLACEMENT_RULE:
+        _parse_placement_rule(obj, value)
     elif f == KnownField.GRID:
         _parse_grid(obj, value)
     elif f == KnownField.WIN_COUNT:
@@ -90,6 +92,10 @@ def _parse_player1_choice(obj: AT3Object, value: str) -> None:
 
     piece = Piece.from_str(piece_str)
     obj.player1_choice = piece
+
+
+def _parse_placement_rule(obj: AT3Object, value: str) -> None:
+    obj.placement_rule = PlacementRule.from_str(value)
 
 
 def _parse_grid(obj: AT3Object, value: str) -> None:
@@ -180,7 +186,7 @@ class Parser:
             raise ParseException(f"move number must increase by 1 each time"
                                  f" ({prev_move_num=} {move_num=})")
 
-    def _parse_move_coordinate(self, obj: AT3Object, token: str) -> Tuple[int, int]:
+    def _parse_move_cell(self, obj: AT3Object, token: str) -> Cell:
         """Token is like 'a1' """
         match = RE_MOVE_COORD.match(token)
         if not match:
@@ -225,11 +231,11 @@ class Parser:
 
                 self.prev_move_num = move_num
 
-                self.state = ParseState.MOVE_COORDINATE
-            elif self.state == ParseState.MOVE_COORDINATE:
-                row_idx, col_idx = self._parse_move_coordinate(obj, token)
+                self.state = ParseState.MOVE_CELL
+            elif self.state == ParseState.MOVE_CELL:
+                cell = self._parse_move_cell(obj, token)
 
-                move = Move(row_idx, col_idx, self.cur_piece)
+                move = Move(cell, self.cur_piece)
                 obj.moves.append(move)
 
                 self._next_piece()

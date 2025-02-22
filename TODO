@@ -12,3 +12,7 @@
 - Rename mark to piece [DONE]
 - Support connect four
     - 7,6,4
+    - fix diagonal checks for arbitrary size boards [DONE]
+    - placement rule to at3 [DONE]
+    - add placement rule to board [DONE]
+    - enforce piece placement rules

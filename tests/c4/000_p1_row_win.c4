@@ -1,0 +1,7 @@
+[Event "000: P1 row win"]
+[Grid "7x7"]
+[WinCount "4"]
+[PlacementRule "ColumnStack"]
+[Player1Choice "X"]
+
+1. a1

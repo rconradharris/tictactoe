@@ -1,23 +1,32 @@
 import string
+from typing import Generator
 
 from engine.exceptions import IllegalMove
-from engine.enums import Piece
+from engine.enums import PlacementRule, Piece
 from engine.move import Move
-from engine.typedefs import StateTable
+from engine.typedefs import Cell, StateTable
 
 class Board:
     """
     Implements a m,n,k-game
     """
 
-    def __init__(self, rows: int = 3, cols: int = 3,
-                 win_count: int = 3) -> None:
+    def __init__(self,
+                 rows: int = 3,
+                 cols: int = 3,
+                 win_count: int = 3,
+                 placement_rule: PlacementRule = PlacementRule.ANYWHERE) -> None:
         """
+        :param rows: number of rows tall the grid is
+        :param cols: number of columns wide the grid is
         :param win: number in a row it takes to win
+        :param placement_rule: constraint on where pieces can be placed
         """
         self.rows: int = rows
         self.cols: int = cols
         self.win_count: int = win_count
+        self.placement_rule: PlacementRule = placement_rule
+
         self.tbl: StateTable = self._init_tbl(rows, cols)
 
     def _init_tbl(self, rows: int, cols: int) -> StateTable:
@@ -50,14 +59,102 @@ class Board:
                 return True
 
         # / direction
-        slash_seq = [row[self.cols - idx - 1] for idx, row in enumerate(self.tbl)]
-        if self._winning_sequence(slash_seq):
+        if self._slash_win():
             return True
 
         # \ direction
-        backslash_seq = [row[idx] for idx, row in enumerate(self.tbl)]
-        if self._winning_sequence(backslash_seq):
+        if self._backslash_win():
             return True
+
+        return False
+
+    def _cell_in_bounds(self, cell: Cell) -> bool:
+        """Returns True if the cell is within the bounds of the board"""
+        row, col = cell
+        return (0 <= row < self.rows) and (0 <= col < self.cols)
+
+    def _diagonal_cells(self, cell, row_delta: int, col_delta: int) -> Generator[Cell]:
+        row, col = cell
+
+        while True:
+            if not self._cell_in_bounds((row, col)):
+                return
+
+            yield (row, col)
+
+            row += row_delta
+            col += col_delta
+
+    def _slash_cells(self, cell) -> Generator[Cell]:
+        """Yield cells in the / direction starting at (row, col)
+
+        Slashes decrement row and increment column.
+        """
+        for cell in self._diagonal_cells(cell, row_delta=-1, col_delta=1):
+            yield cell
+
+    def _backslash_cells(self, cell) -> Generator[Cell]:
+        """Yield cells in the \ direction starting at (row, col)
+
+        Backslashes increment row and increment column.
+        """
+        for cell in self._diagonal_cells(cell, row_delta=1, col_delta=1):
+            yield cell
+
+    def _slash_win(self) -> bool:
+        # / down the rows
+        for ref_row in range(self.rows):
+            seq = []
+            for row, col in self._slash_cells((ref_row, 0)):
+                #print(f"{row=} {col=}")
+                piece = self.tbl[row][col]
+                seq.append(piece)
+
+            #print(f"{seq=}")
+            if self._winning_sequence(seq):
+                return True
+
+        # / across the columns of last row, start at 1 since we already did 0
+        # above
+        last_row_idx = self.rows - 1
+        for ref_col in range(1, self.cols):
+            seq = []
+            for row, col in self._slash_cells((last_row_idx, ref_col)):
+                #print(f"{row=} {col=}")
+                piece = self.tbl[row][col]
+                seq.append(piece)
+
+            #print(f"{seq=}")
+            if self._winning_sequence(seq):
+                return True
+
+        return False
+
+    def _backslash_win(self) -> bool:
+        # \ down the rows
+        for ref_row in range(self.rows):
+            seq = []
+            for row, col in self._backslash_cells((ref_row, 0)):
+                #print(f"{row=} {col=}")
+                piece = self.tbl[row][col]
+                seq.append(piece)
+
+            #print(f"{seq=}")
+            if self._winning_sequence(seq):
+                return True
+
+        # \ across the columns of first row, start at 1 since we already did 0
+        # above
+        for ref_col in range(1, self.cols):
+            seq = []
+            for row, col in self._backslash_cells((0, ref_col)):
+                #print(f"{row=} {col=}")
+                piece = self.tbl[row][col]
+                seq.append(piece)
+
+            #print(f"{seq=}")
+            if self._winning_sequence(seq):
+                return True
 
         return False
 

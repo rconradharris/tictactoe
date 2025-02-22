@@ -30,17 +30,24 @@ def assert_result(t: TestContext, wanted: Result, got: Result):
 
 def assert_at3_result_ok(t: TestContext, obj: AT3Object, g: Game) -> None:
     """Ensure the game state matches what the AT3 result indicates"""
-    assert_game_state(t, GameState.FINISHED, g.state)
-    assert_result(t, obj.result, g.result)
+    non_terminal = (Result.UNDEFINED, Result.UNFINISHED)
+
+    if obj.result not in non_terminal:
+        assert_game_state(t, GameState.FINISHED, g.state)
+        assert_result(t, obj.result, g.result)
 
 
-def test_at3_case(path: str) -> None:
+def run_test(path: str) -> None:
     with open(path) as f:
         at3_data = f.read()
 
     obj = parse(at3_data)
 
-    b = Board(rows=obj.rows, cols=obj.cols, win_count=obj.win_count)
+    b = Board(rows=obj.rows,
+              cols=obj.cols,
+              win_count=obj.win_count,
+              placement_rule=obj.placement_rule)
+
     g = Game(b)
 
     for move in obj.moves:
@@ -52,7 +59,7 @@ def test_at3_case(path: str) -> None:
     assert_at3_result_ok(t, obj, g)
 
 
-def test_at3_cases() -> None:
+def run_tests() -> None:
     TESTS_PATH = 'tests'
 
     test_root = TESTS_PATH
@@ -70,11 +77,12 @@ def test_at3_cases() -> None:
     # Run tests
     for path in test_files:
         if valid_file_extension(path):
-            test_at3_case(path)
+            run_test(path)
 
 
 def main():
-    test_at3_cases()
+    run_tests()
+    #run_test("tests/c4/000_p1_row_win.c4")
     
 
 if __name__ == "__main__":

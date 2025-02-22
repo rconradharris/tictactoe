@@ -7,7 +7,7 @@ class ParseState(Enum):
     INIT = auto()
     METADATA = auto()
     MOVE_NUMBER = auto()
-    MOVE_COORDINATE = auto()
+    MOVE_CELL = auto()
     DONE = auto()
 
 
@@ -24,6 +24,7 @@ class KnownField(Enum):
     PLAYER1_ELO = auto()
     PLAYER2_ELO = auto()
     TIME_CONTROL = auto()
+    PLACEMENT_RULE = auto()
     GRID = auto()
     WIN_COUNT = auto()
     PLAYER1_CHOICE = auto()
@@ -50,6 +51,8 @@ class KnownField(Enum):
             return cls.PLAYER2_ELO
         elif s == "timecontrol":
             return cls.TIME_CONTROL
+        elif s == "placementrule":
+            return cls.PLACEMENT_RULE
         elif s == "grid":
             return cls.GRID
         elif s == "wincount":
