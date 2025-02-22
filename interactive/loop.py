@@ -9,7 +9,6 @@ from interactive.exceptions import ContinueLoop
 
 
 def _show_board(g: Game):
-    print(f"{g.cur_player} {g.state} {g.result}")
     print(g.board.pretty(coords=True))
     print()
 
@@ -27,7 +26,6 @@ COMMANDS
 MOVE SYNTAX
     T3: <column-letter><row-number> (ex: 'a1')
     C4: <column-letter> (ex: 'a')""")
-
 
 
 def _handle_commands(g: Game, cmd_str: str) -> None:
@@ -81,7 +79,7 @@ def _parse_move_c4(g: Game, cell_letter: str, cur_piece: Piece) -> Move:
 
 def _input_move(g: Game, move_num: int, choice: GameChoice, cur_piece: Piece) -> Move:
 
-    cell_str = input(f"{move_num}. Move: ")
+    cell_str = input(f"{move_num}. {cur_piece.pretty()} to Move: ")
 
     _handle_commands(g, cell_str)
 
