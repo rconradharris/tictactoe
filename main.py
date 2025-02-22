@@ -81,8 +81,8 @@ def run_tests() -> None:
 
 
 def main():
-    #run_tests()
-    run_test("tests/c4/000_p1_row_win.c4")
+    run_tests()
+    #run_test("tests/c4/000_p1_row_win.c4")
     
 
 if __name__ == "__main__":

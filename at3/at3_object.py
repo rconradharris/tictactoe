@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+from at3.enums import GameChoice
 from engine.enums import PlacementRule, Piece, Result
 from engine.move import Move
 
@@ -31,6 +32,8 @@ class AT3Object:
     cols: int = 3
 
     win_count: int = 3
+
+    game_choice: GameChoice = GameChoice.UNDEFINED
 
     # Required Fields
     player1_choice: Piece = Piece._

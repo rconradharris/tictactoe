@@ -7,7 +7,7 @@ from at3.exceptions import (
     RequiredFieldMissing,
     UnknownFieldException,
 )
-from at3.enums import KnownField, ParseState
+from at3.enums import GameChoice, KnownField, ParseState
 
 from engine.enums import PlacementRule, Player, Piece, Result
 from engine.move import Move
@@ -63,6 +63,8 @@ def _parse_known_field(obj: AT3Object, f: KnownField, value: str) -> None:
         _parse_grid(obj, value)
     elif f == KnownField.WIN_COUNT:
         _parse_win_count(obj, value)
+    elif f == KnownField.GAME_CHOICE:
+        _parse_game_choice(obj, value)
     elif f == KnownField.PLAYER1_CHOICE:
         # The one required field
         _parse_player1_choice(obj, value)
@@ -114,6 +116,11 @@ def _parse_grid(obj: AT3Object, value: str) -> None:
 
     obj.rows = rows
     obj.cols = cols
+
+
+def _parse_game_choice(obj: AT3Object, value: str) -> None:
+    obj.game_choice = GameChoice.from_str(value)
+
 
 def _parse_win_count(obj: AT3Object, value: str) -> None:
     try:
@@ -252,6 +259,21 @@ class Parser:
     def _check_required_fields(self, obj: AT3Object) -> None:
         self._check_player_choice_specified(obj)
 
+    def _apply_game_choice(self, obj: AT3Object) -> None:
+        c = obj.game_choice
+        if c == GameChoice.UNDEFINED:
+            return
+        elif c == GameChoice.TIC_TAC_TOE:
+            obj.rows = 3
+            obj.cols = 3
+            obj.win_count = 3
+            obj.placement_rule = PlacementRule.ANYWHERE
+        elif c == GameChoice.CONNECT_FOUR:
+            obj.rows = 6
+            obj.cols = 7
+            obj.win_count = 4
+            obj.placement_rule = PlacementRule.COLUMN_STACK
+
     def parse(self, at3_data: str) -> AT3Object:
         if self.state != ParseState.INIT:
             raise ParseStateException("must parse from an initialized state")
@@ -279,5 +301,6 @@ class Parser:
                 self._parse_move_line(obj, line)
 
         self.state = ParseState.DONE
+        self._apply_game_choice(obj)
         self._check_required_fields(obj)
         return obj

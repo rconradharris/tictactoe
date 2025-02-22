@@ -17,4 +17,4 @@
     - add placement rule to board [DONE]j
     - enforce piece placement rules [DONE]
 
-- Add Game enum to AT3 as shorthand for 7,6,4:column stack
+- Add Game enum to AT3 as shorthand for 7,6,4:column stack [DONE]
