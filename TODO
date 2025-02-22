@@ -20,3 +20,4 @@
 - Infer game choice from extension, if possible [DONE]
     - .ttt -> TIC_TAC_TOE [DONE]
     - .c4 -> CONNECT_FOUR [DONE]
+- Replace Cat Game with Draw since connect four is supported [DONE]

@@ -62,7 +62,7 @@ class Game:
                 self._finish_game(Result.PLAYER2_VICTORY)
 
         elif self.board.full():
-            self._finish_game(Result.CAT_GAME)
+            self._finish_game(Result.DRAW)
 
     def apply_move(self, m: Move) -> None:
         self._check_game_state_pre_move(m)

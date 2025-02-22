@@ -11,7 +11,7 @@ class Result(Enum):
     UNFINISHED = auto()
     PLAYER1_VICTORY = auto()
     PLAYER2_VICTORY = auto()
-    CAT_GAME = auto()
+    DRAW = auto()
 
     def pretty(self) -> str:
         if self == self.UNDEFINED:
@@ -22,8 +22,8 @@ class Result(Enum):
             return "1-0"
         elif self == self.PLAYER2_VICTORY:
             return "0-1"
-        elif self == self.CAT_GAME:
-            return "Cat Game"
+        elif self == self.DRAW:
+            return "1/2-1/2"
 
         return "?"
 
@@ -39,8 +39,8 @@ class Result(Enum):
             return cls.PLAYER1_VICTORY
         elif s == "0-1":
             return cls.PLAYER2_VICTORY
-        elif s == "cat game":
-            return cls.CAT_GAME
+        elif s == "1/2-1/2":
+            return cls.DRAW
 
         raise ValueError(f"unknown result: '{s}'")
 
