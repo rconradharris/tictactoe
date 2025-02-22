@@ -213,7 +213,8 @@ class Parser:
 
                 self.state = ParseState.MOVE_CELL
             elif self.state == ParseState.MOVE_CELL:
-                cell = Board.parse_cell(token)
+                sz = (obj.rows, obj.cols)
+                cell = Board.parse_cell(token, sz)
 
                 move = Move(cell, self.cur_piece)
                 obj.moves.append(move)

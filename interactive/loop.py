@@ -1,6 +1,6 @@
 from engine.board import Board
 from engine.enums import GameState, Piece
-from engine.exceptions import IllegalMove
+from engine.exceptions import CellBoundsException, IllegalMove
 from engine.game import Game
 from engine.game_choice import GameChoice
 from engine.move import Move
@@ -44,13 +44,20 @@ def _handle_commands(g: Game, cmd_str: str) -> None:
         raise ContinueLoop
 
 
-def _parse_move_cell(cell_str: str, cur_piece: Piece) -> Move:
+def _parse_move_cell(g: Game, cell_str: str, cur_piece: Piece) -> Move:
     """Treat move as standard algebraic notation, e.g. 'a1'"""
+    b = g.board
+    sz = (b.rows, b.cols)
+
     try:
-        cell = Board.parse_cell(cell_str)
-    except ValueError as e:
+        cell = Board.parse_cell(cell_str, sz)
+    except ValueError:
         # Try again
-        print(e)
+        print("error: invalid move syntax. (hint: 'a1')")
+        raise ContinueLoop
+    except CellBoundsException:
+        # Try again
+        print("error: move must be on the board (hint: 'a1')")
         raise ContinueLoop
 
     return Move(cell, cur_piece)
@@ -61,11 +68,18 @@ def _parse_move_c4(g: Game, cell_letter: str, cur_piece: Piece) -> Move:
     Connect Four player specify the column only and the piece 'drops' into
     place, e.g. 'c'.
     """
+    b = g.board
+    sz = (b.rows, b.cols)
+
     try:
-        col = Board.parse_column_letter(cell_letter)
-    except ValueError as e:
+        col = Board.parse_column_letter(cell_letter, sz)
+    except ValueError:
         # Try again
-        print(e)
+        print("error: invalid column selection (hint: 'a')")
+        raise ContinueLoop
+    except CellBoundsException:
+        # Try again
+        print("error: column selection must be on the board (hint: 'a')")
         raise ContinueLoop
 
     # This simulates gravity by placing the piece on the first not empty row
@@ -86,14 +100,12 @@ def _input_move(g: Game, move_num: int, choice: GameChoice, cur_piece: Piece) ->
     if choice == GameChoice.CONNECT_FOUR:
         move = _parse_move_c4(g, cell_str, cur_piece)
     else:
-        move = _parse_move_cell(cell_str, cur_piece)
+        move = _parse_move_cell(g, cell_str, cur_piece)
 
     return move
 
 
 def _game_loop(g: Game, choice: GameChoice) -> None:
-    _show_board(g)
-
     while True:
         piece_str = input("Choose 'X' or 'O': ")
         piece_str = piece_str.upper()
@@ -105,6 +117,8 @@ def _game_loop(g: Game, choice: GameChoice) -> None:
             continue
         else:
             break
+
+    _show_board(g)
 
     move_num = 1
     while True:

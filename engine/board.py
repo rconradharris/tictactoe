@@ -2,13 +2,13 @@ import re
 import string
 from typing import Generator
 
-from engine.exceptions import IllegalMove
+from engine.exceptions import CellBoundsException, IllegalMove
 from engine.enums import Piece
 from engine.move import Move
 from engine.placement_rule import PlacementRule
-from engine.typedefs import Cell
+from engine.typedefs import BoardSize, Cell
 
-RE_MOVE_COORD = re.compile(r'([a-zA-Z])(\d)')
+RE_MOVE_CELL = re.compile(r'([a-zA-Z])(\d)')
 
 class Board:
     """
@@ -76,17 +76,20 @@ class Board:
 
         return False
 
-    def _cell_in_bounds(self, cell: Cell) -> bool:
+    @classmethod
+    def _cell_in_bounds(self, cell: Cell, sz: BoardSize) -> bool:
         """Returns True if the cell is within the bounds of the board"""
         row, col = cell
-        return (0 <= row < self.rows) and (0 <= col < self.cols)
+        rows, cols = sz
+        return (0 <= row < rows) and (0 <= col < cols)
 
-    def _cell_sequence(self, cell, row_delta: int, col_delta: int) -> Generator[Cell]:
+    def _cell_sequence(self, cell: Cell, row_delta: int, col_delta: int) -> Generator[Cell]:
         """Yield cells in a direction specified by row_delta and col_delta"""
         row, col = cell
+        sz = (self.rows, self.cols)
 
         while True:
-            if not self._cell_in_bounds((row, col)):
+            if not Board._cell_in_bounds((row, col), sz):
                 return
 
             yield (row, col)
@@ -316,9 +319,10 @@ class Board:
             raise IllegalMove(f"piece cannot be blank ({m=})")
 
         b = self
+        sz = (self.rows, self.cols)
 
-        if not self._cell_in_bounds((m.row, m.col)):
-            raise IllegalMove(f"cell out of bounds ({m=} {b=})")
+        if not Board._cell_in_bounds(m.cell, sz):
+            raise CellBoundsException(f"cell out of bounds ({m=} {b=})")
 
         r = self.tbl[m.row]
 
@@ -330,19 +334,35 @@ class Board:
         r[m.col] = m.piece
 
     @classmethod
-    def parse_column_letter(cls, col_letter: str) -> int:
+    def parse_column_letter(cls, col_letter: str, sz: BoardSize) -> int:
         """Returns index associated with a given column letter
 
         For example, 'a' return 0, 'b' returns 1, etc...
         """
         col_letter = col_letter.lower()
-        col_idx = ord(col_letter) - ord('a')
-        return col_idx
+        if len(col_letter) != 1:
+            raise ValueError(f"column must be a single letter ({col_letter})")
+        if col_letter not in string.ascii_lowercase:
+            raise ValueError(
+                f"column must be specified as a letter ({col_letter})")
+
+        col = ord(col_letter) - ord('a')
+
+        _, cols = sz
+        on_board = (0 <= col < cols)
+        if not on_board:
+            raise CellBoundsException(f"cell out of bounds {col_letter=}")
+
+        return col
 
     @classmethod
-    def parse_cell(cls, token: str) -> Cell:
-        """Token is like 'a1' """
-        match = RE_MOVE_COORD.match(token)
+    def parse_cell(cls, token: str, sz: BoardSize) -> Cell:
+        """Token is like 'a1'
+
+        Rows and Cols defines the max indices of respectively so we can
+        enforce bounds checking.
+        """
+        match = RE_MOVE_CELL.match(token)
         if not match:
             raise ValueError(f"syntax error in move coordinate {token=}")
 
@@ -357,4 +377,9 @@ class Board:
 
         row_idx = row_num - 1
 
-        return (row_idx, col_idx)
+        cell = (row_idx, col_idx)
+
+        if not cls._cell_in_bounds(cell, sz):
+            raise CellBoundsException(f"cell out of bounds {token=}")
+
+        return cell
