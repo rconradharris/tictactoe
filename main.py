@@ -71,7 +71,7 @@ def test_at3_case(path: str) -> None:
 
     for move in obj.moves:
         g.apply_move(move)
-        #show_board(g)
+        show_board(g)
 
     t = TestContext(obj.event)
 
