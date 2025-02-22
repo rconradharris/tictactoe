@@ -16,6 +16,6 @@ class Move:
         self.col = col
         self.mark = mark
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Provide a more concise repr than dataclass default"""
         return f"Move({self.row}, {self.col}, {self.mark.pretty()})"

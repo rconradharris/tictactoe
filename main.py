@@ -1,12 +1,14 @@
+from at3.parse import parse
+
 from engine.board import Board
-from engine.enums import GameState, Mark, Player
+from engine.enums import GameState, Mark, Player, Result
 from engine.exceptions import MoveScriptBreak
 from engine.game import Game
 from engine.move import Move
 
 
 def show_board(g: Game):
-    print(f"{g.cur_player=} {g.state=}")
+    print(f"{g.cur_player=} {g.state=} {g.result}")
     print(g.board.pretty(coords=True))
     print()
 
@@ -46,6 +48,10 @@ def assert_player(wanted: Player, got: Player):
     assert wanted == got, f"{wanted=} as the winner, {got=} instead"
 
 
+def assert_result(wanted: Result, got: Result):
+    assert wanted == got, f"{wanted=} as result, {got=} instead"
+
+
 def test_player1_row_win():
     b = Board()
     g = Game(b)
@@ -59,8 +65,10 @@ def test_player1_row_win():
     """
 
     play_move_script(g, script)
-    assert_game_state(GameState.WON, g.state)
-    assert_player(g.cur_player, Player.P1)
+
+    assert_game_state(GameState.FINISHED, g.state)
+    assert_result(Result.PLAYER1_VICTORY, g.result)
+
 
 def test_player2_col_win():
     b = Board()
@@ -76,8 +84,10 @@ def test_player2_col_win():
     """
 
     play_move_script(g, script)
-    assert_game_state(GameState.WON, g.state)
-    assert_player(g.cur_player, Player.P2)
+
+    assert_game_state(GameState.FINISHED, g.state)
+    assert_result(Result.PLAYER2_VICTORY, g.result)
+
 
 def test_player1_backslash_win():
     """Player 1 wins with a '\' sequence"""
@@ -95,8 +105,10 @@ def test_player1_backslash_win():
     """
 
     play_move_script(g, script)
-    assert_game_state(GameState.WON, g.state)
-    assert_player(g.cur_player, Player.P1)
+
+    assert_game_state(GameState.FINISHED, g.state)
+    assert_result(Result.PLAYER1_VICTORY, g.result)
+
 
 def test_player2_forwardslash_win():
     """Player 2 wins with a '/' sequence"""
@@ -113,8 +125,9 @@ def test_player2_forwardslash_win():
     """
 
     play_move_script(g, script)
-    assert_game_state(GameState.WON, g.state)
-    assert_player(g.cur_player, Player.P2)
+
+    assert_game_state(GameState.FINISHED, g.state)
+    assert_result(Result.PLAYER2_VICTORY, g.result)
 
 def test_cat_game():
     b = Board()
@@ -133,15 +146,37 @@ def test_cat_game():
     """
 
     play_move_script(g, script)
-    assert_game_state(GameState.CAT_GAME, g.state)
 
+    assert_game_state(GameState.FINISHED, g.state)
+    assert_result(Result.CAT_GAME, g.result)
+
+def test_at3():
+    at3_data = """
+[Event "World Tic-Tac-Toe Championships"]
+[Site "Los Angeles, CA, USA"]
+[Date "2025.02.21"]
+[Player1 "Alice Kasparov"]
+[Player2 "Bob Carlsen"]
+[Result "Cat Game"]
+[Player1Elo "3000"]
+[Player2Elo "3000"]
+[TimeControl "Whenever"]
+[Grid "3x3"]
+[Player1Choice "X"]
+    
+1. a1
+    """
+    obj = parse(at3_data)
+    print(obj)
 
 def main():
-    test_player1_row_win()
-    #test_player2_col_win()
-    #test_player1_backslash_win()
-    #test_player2_forwardslash_win()
-    #test_cat_game()
+    test_at3()
+
+    ##test_player1_row_win()
+    ##test_player2_col_win()
+    ##test_player1_backslash_win()
+    ##test_player2_forwardslash_win()
+    ##test_cat_game()
     
 
 if __name__ == "__main__":

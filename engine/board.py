@@ -126,7 +126,7 @@ class Board:
         pretty_tbl_str = "\n".join(pretty_tbl)
         return pretty_tbl_str
 
-    def apply_move(self, m: Move):
+    def apply_move(self, m: Move) -> None:
         if m.mark == Mark._:
             raise IllegalMove(f"mark cannot be blank ({m=})")
 
