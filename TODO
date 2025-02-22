@@ -22,5 +22,29 @@
     - .c4 -> CONNECT_FOUR [DONE]
 - Replace Cat Game with Draw since connect four is supported [DONE]
 - Add Board.reset(), call in Game.reset() [DONE]
+- 3D tic-tac-toe
 - Add at3.format()
 - Add interactive command to write at3 file
+
+
+In 2D we have 4 directions: horizontal, vertical, forward slash and
+backslash.
+
+the direction can be reprsented by (row_delta, col_delta)
+
+we also have an origin from where we start the scan.
+
+
+a win scan consists of 2 directions in 2D tic-tac-toe:
+    - we have a 'scan' direction which is a 1D vector in the
+      direction that we're looking for matching pieces
+    - we also ahve a 'cover' direction which is orthogonal which
+      ensures that our scan covers then entire 2D plane
+    - we also have an origin which represents where we start
+      scanning, but if we imagine scanning from -inf to inf maybe
+      we don't need an origin
+
+row_win:
+    cover_direction = (1, 0) # top to bottom
+    scan_direction = (0, 1) # left to right
+    origin = (X, 0) # top to bottom, left to right
