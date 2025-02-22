@@ -1,7 +1,8 @@
 [Event "000: P1 row win"]
-[Grid "7x7"]
+[Grid "7x6"]
+[Result "1-0"]
 [WinCount "4"]
 [PlacementRule "ColumnStack"]
 [Player1Choice "X"]
 
-1. a1
+1. a6 2. a5 3. b6 4. b5 5. c6 6. c5 7. d6

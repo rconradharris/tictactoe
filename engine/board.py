@@ -94,7 +94,7 @@ class Board:
             yield cell
 
     def _backslash_cells(self, cell) -> Generator[Cell]:
-        """Yield cells in the \ direction starting at (row, col)
+        """Yield cells in the backslash direction starting at (row, col)
 
         Backslashes increment row and increment column.
         """
@@ -232,20 +232,49 @@ class Board:
         pretty_tbl_str = "\n".join(pretty_tbl)
         return pretty_tbl_str
 
+    def _top_empty_row_for_column(self, col: int) -> int:
+        """Return the row for the 'top' empty cell in a column
+
+        Returns -1 if there are no empty cells in column
+        """
+        last_row_idx = self.rows - 1
+        for row in range(last_row_idx, 0, -1):
+            piece = self.tbl[row][col]
+            if piece == Piece._:
+                return row
+
+        return -1
+
+    def _check_column_stack(self, m: Move) -> None:
+        row = self._top_empty_row_for_column(m.col)
+        if row < 0:
+            raise IllegalMove(f"column is full ({m=})")
+
+        if m.row != row:
+            raise IllegalMove(f"move must stack ({m=})")
+
+    def _check_piece_placement_rule(self, m: Move) -> None:
+        if self.placement_rule == PlacementRule.ANYWHERE:
+            return
+
+        if self.placement_rule == PlacementRule.COLUMN_STACK:
+            self._check_column_stack(m)
+            return
+
     def apply_move(self, m: Move) -> None:
         if m.piece == Piece._:
             raise IllegalMove(f"piece cannot be blank ({m=})")
 
         b = self
 
-        if m.row > self.rows - 1:
-            raise IllegalMove(f"move row out of bounds ({m=} {b=})")
-        if m.col > self.cols - 1:
-            raise IllegalMove(f"move col out of bounds ({m=} {b=})")
+        if not self._cell_in_bounds((m.row, m.col)):
+            raise IllegalMove(f"cell out of bounds ({m=} {b=})")
 
         r = self.tbl[m.row]
 
         if r[m.col] != Piece._:
             raise IllegalMove(f"cell already occupied by piece ({m=})")
+
+        self._check_piece_placement_rule(m)
 
         r[m.col] = m.piece

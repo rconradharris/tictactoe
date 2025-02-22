@@ -99,12 +99,15 @@ def _parse_placement_rule(obj: AT3Object, value: str) -> None:
 
 
 def _parse_grid(obj: AT3Object, value: str) -> None:
+    """
+    Like 7x6 corresponding to 7 columns by 6 rows.
+    """
     if 'x' not in value:
         raise ParseException(
                 f"'x' must be in grid field ({value=})")
 
     try:
-        rows, cols = map(int, value.split('x'))
+        cols, rows = map(int, value.split('x'))
     except ValueError:
         raise ParseException(
                 f"grid values must be numbers ({value=})")

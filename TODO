@@ -10,9 +10,11 @@
     - win_count [DONE]
     - remove square requirement on board [DONE]
 - Rename mark to piece [DONE]
-- Support connect four
+- Support connect four [DONE]
     - 7,6,4
     - fix diagonal checks for arbitrary size boards [DONE]
     - placement rule to at3 [DONE]
-    - add placement rule to board [DONE]
-    - enforce piece placement rules
+    - add placement rule to board [DONE]j
+    - enforce piece placement rules [DONE]
+
+- Add Game enum to AT3 as shorthand for 7,6,4:column stack
