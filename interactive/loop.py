@@ -162,8 +162,7 @@ def start_loop() -> None:
     params = choice.parameters()
     if params:
         b = Board(
-            rows=params.rows,
-            cols=params.cols,
+            size=params.size,
             win_count=params.win_count,
             placement_rule=params.placement_rule
         )

@@ -25,21 +25,28 @@ class Board:
     """
 
     def __init__(self,
-                 rows: int = 3,
-                 cols: int = 3,
+                 size: BoardSize = (3, 3),
                  win_count: int = 3,
                  placement_rule: PlacementRule = PlacementRule.ANYWHERE) -> None:
         """
-        :param rows: number of rows tall the grid is
-        :param cols: number of columns wide the grid is
+        :param size: (rows, cols) of board
         :param win: number in a row it takes to win
         :param placement_rule: constraint on where pieces can be placed
         """
-        self.rows: int = rows
-        self.cols: int = cols
+        self.size: BoardSize = size
         self.win_count: int = win_count
         self.placement_rule: PlacementRule = placement_rule
         self.reset()
+
+    @property
+    def rows(self) -> int:
+        rows, _, = self.size
+        return rows
+
+    @property
+    def cols(self) -> int:
+        _, cols, = self.size
+        return cols
 
     def reset(self) -> None:
         tbl = []
@@ -368,7 +375,7 @@ class Board:
 
         col_letter, row_num_str = match.groups()
 
-        col_idx = cls.parse_column_letter(col_letter)
+        col_idx = cls.parse_column_letter(col_letter, sz)
 
         try:
             row_num = int(row_num_str)

@@ -6,6 +6,7 @@ from at3.exceptions import UnknownFieldException
 class ParseState(Enum):
     INIT = auto()
     METADATA = auto()
+    METADATA_DONE = auto()
     MOVE_NUMBER = auto()
     MOVE_CELL = auto()
     DONE = auto()

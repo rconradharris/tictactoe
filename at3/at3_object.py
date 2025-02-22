@@ -4,6 +4,7 @@ from engine.enums import Piece, Result
 from engine.game_choice import GameChoice
 from engine.move import Move
 from engine.placement_rule import PlacementRule
+from engine.typedefs import BoardSize
 
 
 @dataclass
@@ -28,9 +29,7 @@ class AT3Object:
 
     placement_rule: PlacementRule = PlacementRule.ANYWHERE
 
-    # Grid field
-    rows: int = 3
-    cols: int = 3
+    size: BoardSize = (3, 3)
 
     win_count: int = 3
 

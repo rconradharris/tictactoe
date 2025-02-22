@@ -45,15 +45,13 @@ class GameChoice(Enum):
         """
         if self == GameChoice.TIC_TAC_TOE:
             return GameParameters(
-                rows=3,
-                cols=3,
+                size = (3, 3),
                 win_count=3,
                 placement_rule=PlacementRule.ANYWHERE
             )
         elif self == GameChoice.CONNECT_FOUR:
             return GameParameters(
-                rows=6,
-                cols=7,
+                size = (6, 7),
                 win_count=4,
                 placement_rule=PlacementRule.COLUMN_STACK
             )

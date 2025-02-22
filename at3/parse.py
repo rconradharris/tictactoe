@@ -116,8 +116,7 @@ def _parse_grid(obj: AT3Object, value: str) -> None:
         raise ParseException(
                 f"grid values must be numbers ({value=})")
 
-    obj.rows = rows
-    obj.cols = cols
+    obj.size = (rows, cols)
 
 
 def _parse_game_choice(obj: AT3Object, value: str) -> None:
@@ -213,8 +212,7 @@ class Parser:
 
                 self.state = ParseState.MOVE_CELL
             elif self.state == ParseState.MOVE_CELL:
-                sz = (obj.rows, obj.cols)
-                cell = Board.parse_cell(token, sz)
+                cell = Board.parse_cell(token, obj.size)
 
                 move = Move(cell, self.cur_piece)
                 obj.moves.append(move)
@@ -233,8 +231,7 @@ class Parser:
     def _apply_game_choice(self, obj: AT3Object) -> None:
         params = obj.game_choice.parameters()
         if params:
-            obj.rows = params.rows
-            obj.cols = params.cols
+            obj.size = params.size
             obj.win_count = params.win_count
             obj.placement_rule = params.placement_rule
 
@@ -259,15 +256,21 @@ class Parser:
 
                 _parse_metadata_line(obj, line)
             else:
+                if self.state == ParseState.METADATA:
+                    self.state = ParseState.METADATA_DONE
+
+            if self.state == ParseState.METADATA_DONE:
+                # Game choice is needed in the move section so that we have
+                # the correct board size defined
+                self._apply_game_choice(obj)
+                self.state = ParseState.MOVE_NUMBER
+
+            if self.state == ParseState.MOVE_NUMBER:
                 if self.cur_piece == Piece._:
                     self.cur_piece = obj.player1_choice
-
-                self._check_move_state(obj)
-                self.state = ParseState.MOVE_NUMBER
 
                 self._parse_move_line(obj, line)
 
         self.state = ParseState.DONE
-        self._apply_game_choice(obj)
         self._check_required_fields(obj)
         return obj

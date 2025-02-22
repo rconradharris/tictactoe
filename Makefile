@@ -8,4 +8,4 @@ test:
 
 check:
 	uv run ruff check
-	uv run mypy main.py
+	uv run mypy .

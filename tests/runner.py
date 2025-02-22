@@ -18,10 +18,13 @@ def run_test(path: str) -> None:
     with open(path) as f:
         at3_data = f.read()
 
-    obj = parse(at3_data, path=path)
+    try:
+        obj = parse(at3_data, path=path)
+    except Exception as e:
+        print(f"{path}: test failure")
+        raise e
 
-    b = Board(rows=obj.rows,
-              cols=obj.cols,
+    b = Board(size=obj.size,
               win_count=obj.win_count,
               placement_rule=obj.placement_rule)
 

@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
 from engine.placement_rule import PlacementRule
+from engine.typedefs import BoardSize
+
 
 @dataclass
 class GameParameters:
-    rows: int
-    cols: int
+    size: BoardSize
     win_count: int
     placement_rule: PlacementRule
