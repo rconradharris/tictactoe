@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import os
 
+from at3 import valid_file_extension
 from at3.at3_object import AT3Object
 from at3.parse import parse
 from engine.board import Board
@@ -51,8 +52,10 @@ def play_move_script(g: Game, script: str):
 def assert_game_state(t: TestContext, wanted: GameState, got: GameState):
     assert wanted == got, f"'{t.description}': {wanted=} {got=}"
 
+
 def assert_result(t: TestContext, wanted: Result, got: Result):
     assert wanted == got, f"'{t.description}': {wanted=} as result, {got=} instead"
+
 
 def assert_at3_result_ok(t: TestContext, obj: AT3Object, g: Game) -> None:
     """Ensure the game state matches what the AT3 result indicates"""
@@ -95,7 +98,7 @@ def test_at3_cases() -> None:
 
     # Run tests
     for path in test_files:
-        if path.endswith('.ttt'):
+        if valid_file_extension(path):
             test_at3_case(path)
 
 

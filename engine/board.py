@@ -10,13 +10,11 @@ class Board:
     Implements a m,n,k-game
     """
 
-    def __init__(self, rows: int = 3, cols: int = 3, win_count: int = 3):
+    def __init__(self, rows: int = 3, cols: int = 3,
+                 win_count: int = 3) -> None:
         """
         :param win: number in a row it takes to win
         """
-        if rows != cols:
-            raise ValueError(f"board must be square ({rows=} {cols=})")
-
         self.rows: int = rows
         self.cols: int = cols
         self.win_count: int = win_count

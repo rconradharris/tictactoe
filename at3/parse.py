@@ -103,10 +103,6 @@ def _parse_grid(obj: AT3Object, value: str) -> None:
         raise ParseException(
                 f"grid values must be numbers ({value=})")
 
-    if rows != cols:
-        raise ParseException(
-                f"grid must be square ({value=})")
-
     obj.rows = rows
     obj.cols = cols
 

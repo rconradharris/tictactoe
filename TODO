@@ -2,9 +2,11 @@
 - Use mypy typechecking [DONE]
 - Create board and game model [DONE]
 - Save move history [DONE]
-- Define PGN equivalent for tic-tac-toe
-    - algebraic tic-tac-toe: at3
-
-- Rewrite tests using this format
-
-- Successfully play tic tac toe
+- Define PGN equivalent for tic-tac-toe [DONE]
+    - algebraic tic-tac-toe: at3 [DONE]
+- Rewrite tests using this format [DONE]
+- Successfully play tic tac toe [DONE]
+- Support m,n,k games
+    - win_count [DONE]
+    - remove square requirement on board [DONE]
+- Support connect four
