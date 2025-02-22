@@ -10,7 +10,7 @@ from at3.exceptions import (
 )
 from at3.enums import KnownField, ParseState
 
-from engine.enums import Mark, Player, Result
+from engine.enums import Player, Piece, Result
 from engine.move import Move
 
 
@@ -86,10 +86,10 @@ def _parse_player_elo(obj: AT3Object, p: Player, value: str) -> None:
 
 
 def _parse_player1_choice(obj: AT3Object, value: str) -> None:
-    mark_str = value.upper()
+    piece_str = value.upper()
 
-    mark = Mark.from_str(mark_str)
-    obj.player1_choice = mark
+    piece = Piece.from_str(piece_str)
+    obj.player1_choice = piece
 
 
 def _parse_grid(obj: AT3Object, value: str) -> None:
@@ -130,7 +130,7 @@ class Parser:
 
     def __init__(self) -> None:
         self.state: ParseState = ParseState.INIT
-        self.cur_mark: Mark = Mark._
+        self.cur_piece: Piece = Piece._
         self.prev_move_num: int = 0
 
     def _check_state(self, allowed: list[ParseState], msg: str) -> None:
@@ -201,15 +201,15 @@ class Parser:
 
         return (row_idx, col_idx)
 
-    def _next_mark(self) -> None:
-        """Advance to the next mark, X -> O, O -> X"""
-        cur_mark = self.cur_mark
-        if cur_mark == Mark.X:
-            self.cur_mark = Mark.O
-        elif cur_mark == Mark.O:
-            self.cur_mark = Mark.X
+    def _next_piece(self) -> None:
+        """Advance to the next piece, X -> O, O -> X"""
+        cur_piece = self.cur_piece
+        if cur_piece == Piece.X:
+            self.cur_piece = Piece.O
+        elif cur_piece == Piece.O:
+            self.cur_piece = Piece.X
         else:
-            raise Exception(f"unknown mark ({cur_mark=})")
+            raise Exception(f"unknown piece ({cur_piece=})")
 
     def _parse_move_line(self, obj: AT3Object, line: str) -> None:
         """
@@ -229,15 +229,15 @@ class Parser:
             elif self.state == ParseState.MOVE_COORDINATE:
                 row_idx, col_idx = self._parse_move_coordinate(obj, token)
 
-                move = Move(row_idx, col_idx, self.cur_mark)
+                move = Move(row_idx, col_idx, self.cur_piece)
                 obj.moves.append(move)
 
-                self._next_mark()
+                self._next_piece()
 
                 self.state = ParseState.MOVE_NUMBER
 
     def _check_player_choice_specified(self, obj: AT3Object) -> None:
-        if obj.player1_choice == Mark._:
+        if obj.player1_choice == Piece._:
             raise RequiredFieldMissing("Player1Choice must be specified")
 
     def _check_required_fields(self, obj: AT3Object) -> None:
@@ -261,8 +261,8 @@ class Parser:
 
                 _parse_metadata_line(obj, line)
             else:
-                if self.cur_mark == Mark._:
-                    self.cur_mark = obj.player1_choice
+                if self.cur_piece == Piece._:
+                    self.cur_piece = obj.player1_choice
 
                 self._check_move_state(obj)
                 self.state = ParseState.MOVE_NUMBER

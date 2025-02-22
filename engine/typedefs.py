@@ -1,3 +1,3 @@
-from engine.enums import  Mark
+from engine.enums import  Piece
 
-type StateTable = list[list[Mark]]
+type StateTable = list[list[Piece]]

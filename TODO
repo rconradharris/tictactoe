@@ -9,4 +9,6 @@
 - Support m,n,k games
     - win_count [DONE]
     - remove square requirement on board [DONE]
+- Rename mark to piece [DONE]
 - Support connect four
+    - 7,6,4

@@ -45,7 +45,7 @@ class Result(Enum):
         raise ValueError(f"unknown result: '{s}'")
 
 
-class Mark(Enum):
+class Piece(Enum):
     _ = auto() 
     X = auto()
     O = auto()  # noqa: E741 (typographically ambiguous with zero, but thats okay)
@@ -61,7 +61,7 @@ class Mark(Enum):
         return "?"
 
     @classmethod
-    def from_str(cls, s: str) -> 'Mark':
+    def from_str(cls, s: str) -> 'Piece':
         if s == "_":
             return cls._
         elif s == "X":
@@ -69,7 +69,7 @@ class Mark(Enum):
         elif s == "O":
             return cls.O
 
-        raise ValueError(f"unknown mark: '{s}'")
+        raise ValueError(f"unknown piece: '{s}'")
 
 
 class GameState(Enum):

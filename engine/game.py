@@ -1,5 +1,5 @@
 from engine.board import Board
-from engine.enums import GameState, Mark, Player, Result
+from engine.enums import GameState, Player, Piece, Result
 from engine.exceptions import IllegalMove
 from engine.move import Move
 
@@ -14,7 +14,7 @@ class Game:
 
     def reset(self) -> None:
         self.cur_player: Player = Player.P1
-        self.mark_selections: dict[Mark, Player] = {}
+        self.piece_selections: dict[Piece, Player] = {}
         self.state: GameState = GameState.INIT
         self.result: Result = Result.UNFINISHED
         self.move_history: list[Move] = []
@@ -25,21 +25,21 @@ class Game:
         else:
             self.cur_player = Player.P1
 
-    def _check_mark_consistency(self, m: Move) -> None:
-        """Ensure players cannot switch marks once they've chosen"""
-        cur_mark = m.mark
+    def _check_piece_consistency(self, m: Move) -> None:
+        """Ensure players cannot switch pieces once they've chosen"""
+        cur_piece = m.piece
 
-        if cur_mark == Mark._:
-            raise IllegalMove(f"mark cannot be blank ({m=})")
+        if cur_piece == Piece._:
+            raise IllegalMove(f"piece cannot be blank ({m=})")
 
-        prev_player = self.mark_selections.get(cur_mark, None)
+        prev_player = self.piece_selections.get(cur_piece, None)
 
         if prev_player is not None and prev_player != self.cur_player:
-            raise IllegalMove(f"player cannot switch marks ({m=})")
+            raise IllegalMove(f"player cannot switch pieces ({m=})")
 
-    def _choose_mark_for_cur_player(self, m: Mark) -> None:
-        """Declare a mark choice for the current player"""
-        self.mark_selections[m] = self.cur_player 
+    def _choose_piece_for_cur_player(self, m: Piece) -> None:
+        """Declare a piece choice for the current player"""
+        self.piece_selections[m] = self.cur_player 
 
     def _check_game_state_pre_move(self, m: Move) -> None:
         if self.state == GameState.FINISHED:
@@ -69,8 +69,8 @@ class Game:
 
         self._start_game_if_needed()
         
-        self._check_mark_consistency(m)
-        self._choose_mark_for_cur_player(m.mark)
+        self._check_piece_consistency(m)
+        self._choose_piece_for_cur_player(m.piece)
 
         self.board.apply_move(m)
 

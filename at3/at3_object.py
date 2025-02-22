@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from engine.enums import Mark, Result
+from engine.enums import Piece, Result
 from engine.move import Move
 
 
@@ -31,7 +31,7 @@ class AT3Object:
     win_count: int = 3
 
     # Required Fields
-    player1_choice: Mark = Mark._
+    player1_choice: Piece = Piece._
 
     # All Fields (known and unknown)
     #

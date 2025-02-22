@@ -5,10 +5,8 @@ from at3 import valid_file_extension
 from at3.at3_object import AT3Object
 from at3.parse import parse
 from engine.board import Board
-from engine.enums import GameState, Mark, Result
-from engine.exceptions import MoveScriptBreak
+from engine.enums import GameState, Result
 from engine.game import Game
-from engine.move import Move
 
 
 @dataclass
@@ -20,33 +18,6 @@ def show_board(g: Game):
     print(f"{g.cur_player=} {g.state=} {g.result}")
     print(g.board.pretty(coords=True))
     print()
-
-
-def parse_move_script_line(line: str) -> Move:
-    if line == "break":
-        raise MoveScriptBreak
-
-    coords, mark_str = line.split(" ")
-
-    row, col = map(int, coords.split(","))
-    mark = Mark.from_str(mark_str)
-
-    return Move(row, col, mark)
-
-
-def play_move_script(g: Game, script: str):
-    show_board(g)
-
-    for line in script.split('\n'):
-        line = line.strip()
-        if not line:
-            continue
-
-        move = parse_move_script_line(line)
-
-        g.apply_move(move)
-
-        show_board(g)
 
 
 def assert_game_state(t: TestContext, wanted: GameState, got: GameState):

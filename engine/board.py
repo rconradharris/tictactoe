@@ -1,7 +1,7 @@
 import string
 
 from engine.exceptions import IllegalMove
-from engine.enums import Mark
+from engine.enums import Piece
 from engine.move import Move
 from engine.typedefs import StateTable
 
@@ -23,15 +23,15 @@ class Board:
     def _init_tbl(self, rows: int, cols: int) -> StateTable:
         tbl = []
         for _ in range(rows):
-            row = [Mark._ for _ in range(cols)]
+            row = [Piece._ for _ in range(cols)]
             tbl.append(row)
         return tbl
 
     def full(self) -> bool:
-        """Return True if the board is full of marks"""
+        """Return True if the board is full of pieces"""
         for row in self.tbl:
-            for mark in row:
-                if mark == Mark._:
+            for piece in row:
+                if piece == Piece._:
                     return False
         return True
 
@@ -61,27 +61,27 @@ class Board:
 
         return False
 
-    def _winning_sequence(self, mark_seq: list[Mark]) -> bool:
-        """Returns True if a list of marks (corresponding to rows, cols, or
+    def _winning_sequence(self, piece_seq: list[Piece]) -> bool:
+        """Returns True if a list of pieces (corresponding to rows, cols, or
         diagonals) are a winning sequence: we have `win_count` in a row
         """
-        prev_mark = None
+        prev_piece = None
         run_count = 0
 
-        for mark in mark_seq:
-            if mark == Mark._:
+        for piece in piece_seq:
+            if piece == Piece._:
                 run_count = 0
-            elif prev_mark is None:
+            elif prev_piece is None:
                 run_count = 1
-            elif prev_mark != mark:
+            elif prev_piece != piece:
                 run_count = 1
-            elif prev_mark == mark:
+            elif prev_piece == piece:
                 run_count += 1
 
             if run_count >= self.win_count:
                 return True
 
-            prev_mark = mark
+            prev_piece = piece
 
         return False
 
@@ -115,9 +115,9 @@ class Board:
 
         for idx, row in enumerate(self.tbl):
             pretty_row = []
-            for mark in row:
-                mark_str = mark.pretty().center(cell_width)
-                pretty_row.append(mark_str)
+            for piece in row:
+                piece_str = piece.pretty().center(cell_width)
+                pretty_row.append(piece_str)
 
             pretty_row_str = vert_break.join(pretty_row)
 
@@ -136,8 +136,8 @@ class Board:
         return pretty_tbl_str
 
     def apply_move(self, m: Move) -> None:
-        if m.mark == Mark._:
-            raise IllegalMove(f"mark cannot be blank ({m=})")
+        if m.piece == Piece._:
+            raise IllegalMove(f"piece cannot be blank ({m=})")
 
         b = self
 
@@ -148,7 +148,7 @@ class Board:
 
         r = self.tbl[m.row]
 
-        if r[m.col] != Mark._:
-            raise IllegalMove(f"spot already marked ({m=})")
+        if r[m.col] != Piece._:
+            raise IllegalMove(f"cell already occupied by piece ({m=})")
 
-        r[m.col] = m.mark
+        r[m.col] = m.piece
