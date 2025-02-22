@@ -14,7 +14,9 @@
     - 7,6,4
     - fix diagonal checks for arbitrary size boards [DONE]
     - placement rule to at3 [DONE]
-    - add placement rule to board [DONE]j
+    - add placement rule to board [DONE]
     - enforce piece placement rules [DONE]
-
 - Add Game enum to AT3 as shorthand for 7,6,4:column stack [DONE]
+- Infer game choice from extension, if possible [DONE]
+    - .ttt -> TIC_TAC_TOE [DONE]
+    - .c4 -> CONNECT_FOUR [DONE]

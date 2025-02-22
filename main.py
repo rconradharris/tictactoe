@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import os
 
-from at3 import valid_file_extension
 from at3.at3_object import AT3Object
+from at3.file_extensions import valid_file_extension
 from at3.parse import parse
 from engine.board import Board
 from engine.enums import GameState, Result
@@ -41,7 +41,7 @@ def run_test(path: str) -> None:
     with open(path) as f:
         at3_data = f.read()
 
-    obj = parse(at3_data)
+    obj = parse(at3_data, path=path)
 
     b = Board(rows=obj.rows,
               cols=obj.cols,
@@ -50,23 +50,26 @@ def run_test(path: str) -> None:
 
     g = Game(b)
 
+    t = TestContext(obj.event)
+
+    show_board(g)
     for move in obj.moves:
-        g.apply_move(move)
+        try:
+            g.apply_move(move)
+        except Exception as e:
+            print(f"{t.description}: test failure")
+            raise e
+
         show_board(g)
 
-    t = TestContext(obj.event)
 
     assert_at3_result_ok(t, obj, g)
 
 
-def run_tests() -> None:
-    TESTS_PATH = 'tests'
-
-    test_root = TESTS_PATH
-
+def run_tests(root: str) -> None:
     # Collect test files
     test_files = []
-    for dirpath, dirnames, filenames in os.walk(test_root):
+    for dirpath, dirnames, filenames in os.walk(root):
         for filename in filenames:
             path = os.path.join(dirpath, filename)
             test_files.append(path)
@@ -81,7 +84,8 @@ def run_tests() -> None:
 
 
 def main():
-    run_tests()
+    run_tests('tests')
+    #run_tests('tests/c4')
     #run_test("tests/c4/000_p1_row_win.c4")
     
 

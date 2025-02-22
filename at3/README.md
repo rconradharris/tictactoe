@@ -18,8 +18,12 @@ Rows are numbered top to bottom: 1, 2, 3...
 File Extension
 ==============
 
-AT3 files use the '.ttt' extension for tic-tac-toe m,n,k games. You can also
-use '.c4' for connect-four games
+AT3 file use the '.at3' extension as a default. This supports arbitrary m,n,k style games.
+
+You can use '.ttt' as a short-hand for tic-tac-toe and this will
+apply those game parameters.
+
+Likewise, you can use '.c4' as a short-hand for Connect Four.
 
 Sample 
 ======

@@ -8,6 +8,7 @@ from at3.exceptions import (
     UnknownFieldException,
 )
 from at3.enums import GameChoice, KnownField, ParseState
+from at3.file_extensions import game_choice_from_extension
 
 from engine.enums import PlacementRule, Player, Piece, Result
 from engine.move import Move
@@ -136,10 +137,10 @@ def _parse_win_count(obj: AT3Object, value: str) -> None:
     obj.win_count = win_count
 
 
-def parse(at3_data: str) -> AT3Object:
+def parse(at3_data: str, path: str | None = None) -> AT3Object:
     """Convenience function to parse"""
     parser = Parser()
-    return parser.parse(at3_data)
+    return parser.parse(at3_data, path=path)
 
 
 class Parser:
@@ -274,11 +275,14 @@ class Parser:
             obj.win_count = 4
             obj.placement_rule = PlacementRule.COLUMN_STACK
 
-    def parse(self, at3_data: str) -> AT3Object:
+    def parse(self, at3_data: str, path: str | None = None) -> AT3Object:
         if self.state != ParseState.INIT:
             raise ParseStateException("must parse from an initialized state")
 
         obj = AT3Object()
+
+        if path:
+            obj.game_choice = game_choice_from_extension(path)
 
         lines = at3_data.split("\n")
         for line in lines:
