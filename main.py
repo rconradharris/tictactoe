@@ -4,7 +4,7 @@ import os
 from at3.at3_object import AT3Object
 from at3.parse import parse
 from engine.board import Board
-from engine.enums import GameState, Mark, Player, Result
+from engine.enums import GameState, Mark, Result
 from engine.exceptions import MoveScriptBreak
 from engine.game import Game
 from engine.move import Move
@@ -48,88 +48,16 @@ def play_move_script(g: Game, script: str):
         show_board(g)
 
 
-def assert_game_state(wanted: GameState, got: GameState):
-    assert wanted == got, f"{wanted=} {got=}"
-
-def assert_game_state2(t: TestContext, wanted: GameState, got: GameState):
+def assert_game_state(t: TestContext, wanted: GameState, got: GameState):
     assert wanted == got, f"'{t.description}': {wanted=} {got=}"
 
-def assert_player(wanted: Player, got: Player):
-    assert wanted == got, f"{wanted=} as the winner, {got=} instead"
-
-
-def assert_result(wanted: Result, got: Result):
-    assert wanted == got, f"{wanted=} as result, {got=} instead"
-
-def assert_result2(t: TestContext, wanted: Result, got: Result):
+def assert_result(t: TestContext, wanted: Result, got: Result):
     assert wanted == got, f"'{t.description}': {wanted=} as result, {got=} instead"
-
-def test_player1_backslash_win():
-    """Player 1 wins with a '\' sequence"""
-    b = Board()
-    g = Game(b)
-
-    script = """
-    1,1 X
-    0,2 O
-    1,0 X
-    1,2 O
-    2,2 X
-    2,0 O
-    0,0 X
-    """
-
-    play_move_script(g, script)
-
-    assert_game_state(GameState.FINISHED, g.state)
-    assert_result(Result.PLAYER1_VICTORY, g.result)
-
-
-def test_player2_forwardslash_win():
-    """Player 2 wins with a '/' sequence"""
-    b = Board()
-    g = Game(b)
-
-    script = """
-    0,0 X
-    0,2 O
-    1,0 X
-    1,1 O
-    0,1 X
-    2,0 O
-    """
-
-    play_move_script(g, script)
-
-    assert_game_state(GameState.FINISHED, g.state)
-    assert_result(Result.PLAYER2_VICTORY, g.result)
-
-def test_cat_game():
-    b = Board()
-    g = Game(b)
-
-    script = """
-    1,1 X
-    0,0 O
-    2,1 X
-    0,1 O
-    0,2 X
-    2,0 O
-    1,0 X
-    1,2 O
-    2,2 X
-    """
-
-    play_move_script(g, script)
-
-    assert_game_state(GameState.FINISHED, g.state)
-    assert_result(Result.CAT_GAME, g.result)
-
 
 def assert_at3_result_ok(t: TestContext, obj: AT3Object, g: Game) -> None:
     """Ensure the game state matches what the AT3 result indicates"""
-    assert_game_state2(t, GameState.FINISHED, g.state)
-    assert_result2(t, obj.result, g.result)
+    assert_game_state(t, GameState.FINISHED, g.state)
+    assert_result(t, obj.result, g.result)
 
 
 def test_at3_case(path: str) -> None:
@@ -143,7 +71,7 @@ def test_at3_case(path: str) -> None:
 
     for move in obj.moves:
         g.apply_move(move)
-        show_board(g)
+        #show_board(g)
 
     t = TestContext(obj.event)
 
@@ -164,10 +92,6 @@ def test_at3_cases() -> None:
 
 def main():
     test_at3_cases()
-
-    ##test_player1_backslash_win()
-    ##test_player2_forwardslash_win()
-    ##test_cat_game()
     
 
 if __name__ == "__main__":

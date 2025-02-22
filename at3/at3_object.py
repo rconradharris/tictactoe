@@ -15,6 +15,11 @@ chooses Xs or Os (oh, oh, oh).
 Columns are lettered left to right: a, b, c...
 Rows are numbered top to bottom: 1, 2, 3...
 
+File Extension
+==============
+
+AT3 files use the '.ttt' extension
+
 Sample 
 ======
 
