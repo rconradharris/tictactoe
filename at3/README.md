@@ -7,9 +7,6 @@ Count` fields. Connect Four is supported by setting `PlacementRule` to
 
 Arbitrary metadata can be included using brackets.
 
-One piece of specialized metadata is the grid field. If provided, an
-arbitrary square grid can be specifie, otherwise a 3x3 is assumed.
-
 Grid Size
 =========
 
