@@ -120,6 +120,7 @@ class Parser:
     def __init__(self) -> None:
         self.state: ParseState = ParseState.INIT
         self.cur_mark: Mark = Mark._
+        self.prev_move_num: int = 0
 
     def _check_state(self, allowed: list[ParseState], msg: str) -> None:
         state = self.state
@@ -162,10 +163,11 @@ class Parser:
 
         return move_num
 
-    def _check_move_number_monotonic(
-            self, prev_move_num: int, move_num: int, token: str) -> None:
+    def _check_move_number_monotonic(self, move_num: int) -> None:
+        prev_move_num = self.prev_move_num
         if (move_num - prev_move_num) != 1:
-            raise ParseException(f"move number must increase by 1 each time ({token=})")
+            raise ParseException(f"move number must increase by 1 each time"
+                                 f" ({prev_move_num=} {move_num=})")
 
     def _parse_move_coordinate(self, obj: AT3Object, token: str) -> Tuple[int, int]:
         """Token is like 'a1' """
@@ -204,15 +206,13 @@ class Parser:
         """
         tokens = line.split(" ")
 
-        prev_move_num = 0
         for token in tokens:
             if self.state == ParseState.MOVE_NUMBER:
                 move_num = self._parse_move_number(token)
 
-                self._check_move_number_monotonic(
-                        prev_move_num, move_num, token)
+                self._check_move_number_monotonic(move_num)
 
-                prev_move_num = move_num
+                self.prev_move_num = move_num
 
                 self.state = ParseState.MOVE_COORDINATE
             elif self.state == ParseState.MOVE_COORDINATE:

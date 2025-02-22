@@ -1,10 +1,18 @@
-from at3.parse import parse
+from dataclasses import dataclass
+import os
 
+from at3.at3_object import AT3Object
+from at3.parse import parse
 from engine.board import Board
 from engine.enums import GameState, Mark, Player, Result
 from engine.exceptions import MoveScriptBreak
 from engine.game import Game
 from engine.move import Move
+
+
+@dataclass
+class TestContext:
+    description: str
 
 
 def show_board(g: Game):
@@ -43,6 +51,8 @@ def play_move_script(g: Game, script: str):
 def assert_game_state(wanted: GameState, got: GameState):
     assert wanted == got, f"{wanted=} {got=}"
 
+def assert_game_state2(t: TestContext, wanted: GameState, got: GameState):
+    assert wanted == got, f"'{t.description}': {wanted=} {got=}"
 
 def assert_player(wanted: Player, got: Player):
     assert wanted == got, f"{wanted=} as the winner, {got=} instead"
@@ -51,43 +61,8 @@ def assert_player(wanted: Player, got: Player):
 def assert_result(wanted: Result, got: Result):
     assert wanted == got, f"{wanted=} as result, {got=} instead"
 
-
-def test_player1_row_win():
-    b = Board()
-    g = Game(b)
-
-    script = """
-    1,2 X
-    0,2 O
-    1,0 X
-    2,0 O
-    1,1 X
-    """
-
-    play_move_script(g, script)
-
-    assert_game_state(GameState.FINISHED, g.state)
-    assert_result(Result.PLAYER1_VICTORY, g.result)
-
-
-def test_player2_col_win():
-    b = Board()
-    g = Game(b)
-
-    script = """
-    1,1 X
-    0,2 O
-    1,0 X
-    1,2 O
-    0,0 X
-    2,2 O
-    """
-
-    play_move_script(g, script)
-
-    assert_game_state(GameState.FINISHED, g.state)
-    assert_result(Result.PLAYER2_VICTORY, g.result)
-
+def assert_result2(t: TestContext, wanted: Result, got: Result):
+    assert wanted == got, f"'{t.description}': {wanted=} as result, {got=} instead"
 
 def test_player1_backslash_win():
     """Player 1 wins with a '\' sequence"""
@@ -150,30 +125,46 @@ def test_cat_game():
     assert_game_state(GameState.FINISHED, g.state)
     assert_result(Result.CAT_GAME, g.result)
 
-def test_at3():
-    at3_data = """
-[Event "World Tic-Tac-Toe Championships"]
-[Site "Los Angeles, CA, USA"]
-[Date "2025.02.21"]
-[Player1 "Alice Kasparov"]
-[Player2 "Bob Carlsen"]
-[Result "Cat Game"]
-[Player1Elo "3000"]
-[Player2Elo "3000"]
-[TimeControl "Whenever"]
-[Grid "3x3"]
-[Player1Choice "X"]
-    
-1. a1 2. b2
-    """
+
+def assert_at3_result_ok(t: TestContext, obj: AT3Object, g: Game) -> None:
+    """Ensure the game state matches what the AT3 result indicates"""
+    assert_game_state2(t, GameState.FINISHED, g.state)
+    assert_result2(t, obj.result, g.result)
+
+
+def test_at3_case(path: str) -> None:
+    with open(path) as f:
+        at3_data = f.read()
+
     obj = parse(at3_data)
-    print(obj)
+
+    b = Board(rows=obj.rows, cols=obj.cols)
+    g = Game(b)
+
+    for move in obj.moves:
+        g.apply_move(move)
+        show_board(g)
+
+    t = TestContext(obj.event)
+
+    assert_at3_result_ok(t, obj, g)
+
+
+def test_at3_cases() -> None:
+    TEST_CASES_PATH = 'tests/cases'
+    filenames = os.listdir(TEST_CASES_PATH)
+    filenames.sort()
+    for filename in filenames:
+        if not filename.endswith('.ttt'):
+            continue
+
+        path = os.path.join(TEST_CASES_PATH, filename)
+        test_at3_case(path)
+
 
 def main():
-    test_at3()
+    test_at3_cases()
 
-    ##test_player1_row_win()
-    ##test_player2_col_win()
     ##test_player1_backslash_win()
     ##test_player2_forwardslash_win()
     ##test_cat_game()
