@@ -5,7 +5,7 @@ from engine.placement_rule import PlacementRule
 
 
 class GameChoice(Enum):
-    """Acts as a shortcut for certain game parameters so you don't have to
+    """Acts as a fixed menu for certain game parameters so you don't have to
     fill in Grid, WinCount and PlacementRule explicitly.
     """
     UNDEFINED = auto()
