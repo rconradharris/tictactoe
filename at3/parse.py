@@ -59,6 +59,8 @@ def _parse_known_field(obj: AT3Object, f: KnownField, value: str) -> None:
         obj.time_control = value
     elif f == KnownField.GRID:
         _parse_grid(obj, value)
+    elif f == KnownField.WIN_COUNT:
+        _parse_win_count(obj, value)
     elif f == KnownField.PLAYER1_CHOICE:
         # The one required field
         _parse_player1_choice(obj, value)
@@ -107,6 +109,19 @@ def _parse_grid(obj: AT3Object, value: str) -> None:
 
     obj.rows = rows
     obj.cols = cols
+
+def _parse_win_count(obj: AT3Object, value: str) -> None:
+    try:
+        win_count = int(value)
+    except ValueError:
+        raise ParseException(
+                f"win count must be a number ({value=})")
+
+    if win_count <= 0:
+        raise ParseException(
+                f"win count must be greater than zero ({value=})")
+
+    obj.win_count = win_count
 
 
 def parse(at3_data: str) -> AT3Object:

@@ -33,6 +33,7 @@ Sample
 [Player2Elo "3000"]
 [TimeControl "Whenever"]
 [Grid "3x3"]
+[WinCount "3"]
 [Player1Choice "X"]
 
 1. a1 2. b2
@@ -70,6 +71,8 @@ class AT3Object:
     # Grid field
     rows: int = 3
     cols: int = 3
+
+    win_count: int = 3
 
     # Required Fields
     player1_choice: Mark = Mark._

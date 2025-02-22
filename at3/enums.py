@@ -25,6 +25,7 @@ class KnownField(Enum):
     PLAYER2_ELO = auto()
     TIME_CONTROL = auto()
     GRID = auto()
+    WIN_COUNT = auto()
     PLAYER1_CHOICE = auto()
 
     @classmethod
@@ -51,6 +52,8 @@ class KnownField(Enum):
             return cls.TIME_CONTROL
         elif s == "grid":
             return cls.GRID
+        elif s == "wincount":
+            return cls.WIN_COUNT
         elif s == "player1choice":
             return cls.PLAYER1_CHOICE
 

@@ -66,7 +66,7 @@ def test_at3_case(path: str) -> None:
 
     obj = parse(at3_data)
 
-    b = Board(rows=obj.rows, cols=obj.cols)
+    b = Board(rows=obj.rows, cols=obj.cols, win_count=obj.win_count)
     g = Game(b)
 
     for move in obj.moves:

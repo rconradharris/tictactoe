@@ -6,13 +6,20 @@ from engine.move import Move
 from engine.typedefs import StateTable
 
 class Board:
+    """
+    Implements a m,n,k-game
+    """
 
-    def __init__(self, rows: int = 3, cols: int = 3):
+    def __init__(self, rows: int = 3, cols: int = 3, win_count: int = 3):
+        """
+        :param win: number in a row it takes to win
+        """
         if rows != cols:
             raise ValueError(f"board must be square ({rows=} {cols=})")
 
         self.rows: int = rows
         self.cols: int = cols
+        self.win_count: int = win_count
         self.tbl: StateTable = self._init_tbl(rows, cols)
 
     def _init_tbl(self, rows: int, cols: int) -> StateTable:
@@ -58,23 +65,27 @@ class Board:
 
     def _winning_sequence(self, mark_seq: list[Mark]) -> bool:
         """Returns True if a list of marks (corresponding to rows, cols, or
-        diagonals) are a winning sequence: all the same, not blanks
+        diagonals) are a winning sequence: we have `win_count` in a row
         """
         prev_mark = None
+        run_count = 0
 
         for mark in mark_seq:
             if mark == Mark._:
-                return False
+                run_count = 0
+            elif prev_mark is None:
+                run_count = 1
+            elif prev_mark != mark:
+                run_count = 1
+            elif prev_mark == mark:
+                run_count += 1
 
-            if prev_mark is not None and prev_mark != mark:
-                # Found a different mark, no winner here
-                return False
+            if run_count >= self.win_count:
+                return True
 
             prev_mark = mark
 
-        # All marks the same, chicken dinner
-        return True
-
+        return False
 
     def pretty(self, coords=False) -> str:
         """
