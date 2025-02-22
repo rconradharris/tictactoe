@@ -14,8 +14,9 @@ Inspired by PGN, AT3, or algebraic Tic-Tac-Toe Notation, lets players capture
 their masterpieces in a simple, plain text file so they can live on for
 all-time.
 
-But wait, Wikipedia tells us that Tic-Tac-Toe is a specialization of "m,n,k"
-games, so let's support those too! 4x5 Tic-Tac-Toe where it takes 2 in a row to
+But wait, Wikipedia tells us that Tic-Tac-Toe is a specialization of
+[m,n,k games](https://en.wikipedia.org/wiki/M,n,k-game)
+, so let's support those too! 4x5 Tic-Tac-Toe where it takes 2 in a row to
 win? Not sure why you'd want to, but we can do it!
 
 Oh, Connect Four is eerily similar, just slight restrictions on where pieces can
