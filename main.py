@@ -5,8 +5,11 @@ from at3.at3_object import AT3Object
 from at3.file_extensions import valid_file_extension
 from at3.parse import parse
 from engine.board import Board
-from engine.enums import GameState, Result
+from engine.enums import GameState, Piece, Result
+from engine.exceptions import IllegalMove
 from engine.game import Game
+from engine.game_choice import GameChoice
+from engine.move import Move
 
 
 @dataclass
@@ -15,7 +18,7 @@ class TestContext:
 
 
 def show_board(g: Game):
-    print(f"{g.cur_player=} {g.state=} {g.result}")
+    print(f"{g.cur_player} {g.state} {g.result}")
     print(g.board.pretty(coords=True))
     print()
 
@@ -83,7 +86,89 @@ def run_tests(root: str) -> None:
             run_test(path)
 
 
+
+def game_loop(g: Game) -> None:
+    CMD_SHOW_BOARD = "."
+
+    show_board(g)
+
+    while True:
+        piece_str = input('X or O? ')
+        piece_str = piece_str.upper()
+        try:
+            cur_piece = Piece.from_str(piece_str)
+        except ValueError as e:
+            # Try again
+            print(e)
+            continue
+        else:
+            break
+
+    move_num = 1
+    while True:
+        if g.state == GameState.FINISHED:
+            break
+
+        cell_str = input(f"{move_num}. Move? ")
+
+        if cell_str == CMD_SHOW_BOARD:
+            show_board(g)
+            continue
+
+        try:
+            cell = Board.parse_algebraic_cell(cell_str)
+        except ValueError as e:
+            # Try again
+            print(e)
+            continue
+
+        move = Move(cell, cur_piece)
+
+        try:
+            g.apply_move(move)
+        except IllegalMove as e:
+            # Try again
+            print(e)
+            continue
+
+        show_board(g)
+
+        move_num += 1
+        cur_piece = cur_piece.next()
+
+    print(g.result)
+
+
+def interactive() -> None:
+    while True:
+        choice_str = input('Tic-Tac-Toe or Connect Four (T3 or C4)? ')
+        try:
+            choice = GameChoice.from_abbrev(choice_str)
+        except ValueError as e:
+            # Try again
+            print(e)
+            continue
+        else:
+            break
+
+    b = Board()
+
+    params = choice.parameters()
+    if params:
+        b = Board(
+            rows=params.rows,
+            cols=params.cols,
+            win_count=params.win_count,
+            placement_rule=params.placement_rule
+        )
+
+    g = Game(b)
+
+    game_loop(g)
+
+
 def main():
+    #interactive()
     run_tests('tests')
     #run_tests('tests/c4')
     #run_test("tests/c4/000_p1_row_win.c4")

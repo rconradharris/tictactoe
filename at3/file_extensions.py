@@ -1,6 +1,6 @@
 import os
 
-from at3.enums import GameChoice
+from engine.game_choice import GameChoice
 
 _extensions: dict[str, GameChoice] = {
     ".at3": GameChoice.UNDEFINED,

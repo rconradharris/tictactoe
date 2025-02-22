@@ -1,10 +1,14 @@
+import re
 import string
 from typing import Generator
 
 from engine.exceptions import IllegalMove
-from engine.enums import PlacementRule, Piece
+from engine.enums import Piece
 from engine.move import Move
+from engine.placement_rule import PlacementRule
 from engine.typedefs import Cell, StateTable
+
+RE_MOVE_COORD = re.compile(r'([a-zA-Z])(\d)')
 
 class Board:
     """
@@ -276,7 +280,7 @@ class Board:
     def _top_empty_row_for_column(self, col: int) -> int:
         """Return the row for the 'top' empty cell in a column
 
-        Returns -1 if there are no empty cells in column
+        Returns 0 if there are no empty cells in column
         """
         last_row_idx = self.rows - 1
         for row in range(last_row_idx, 0, -1):
@@ -284,13 +288,10 @@ class Board:
             if piece == Piece._:
                 return row
 
-        return -1
+        return 0 
 
     def _check_column_stack(self, m: Move) -> None:
         row = self._top_empty_row_for_column(m.col)
-        if row < 0:
-            raise IllegalMove(f"column is full ({m=})")
-
         if m.row != row:
             raise IllegalMove(f"move must stack ({m=})")
 
@@ -319,3 +320,25 @@ class Board:
         self._check_piece_placement_rule(m)
 
         r[m.col] = m.piece
+
+    @classmethod
+    def parse_algebraic_cell(cls, token: str) -> Cell:
+        """Token is like 'a1' """
+        match = RE_MOVE_COORD.match(token)
+        if not match:
+            raise ValueError(f"syntax error in move coordinate {token=}")
+
+        col_letter, row_num_str = match.groups()
+
+        col_letter = col_letter.lower()
+
+        col_idx = ord(col_letter) - ord('a')
+
+        try:
+            row_num = int(row_num_str)
+        except ValueError:
+            raise ValueError(f"row number must be a number {token=}")
+
+        row_idx = row_num - 1
+
+        return (row_idx, col_idx)

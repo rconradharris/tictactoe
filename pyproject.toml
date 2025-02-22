@@ -1,7 +1,7 @@
 [project]
 name = "tictactoe"
 version = "0.1.0"
-description = "Add your description here"
+description = "Tic-Tac-Toe, Connect Four and variants"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 
-from at3.enums import GameChoice
-from engine.enums import PlacementRule, Piece, Result
+from engine.enums import Piece, Result
+from engine.game_choice import GameChoice
 from engine.move import Move
+from engine.placement_rule import PlacementRule
 
 
 @dataclass

@@ -7,16 +7,17 @@ from at3.exceptions import (
     RequiredFieldMissing,
     UnknownFieldException,
 )
-from at3.enums import GameChoice, KnownField, ParseState
+from at3.enums import KnownField, ParseState
 from at3.file_extensions import game_choice_from_extension
 
-from engine.enums import PlacementRule, Player, Piece, Result
+from engine.board import Board
+from engine.enums import Player, Piece, Result
+from engine.game_choice import GameChoice
 from engine.move import Move
-from engine.typedefs import Cell
+from engine.placement_rule import PlacementRule
 
 
 RE_METADATA_LINE = re.compile(r'\s*\[(\w+)\s+\"(.+)\"\]\s*')
-RE_MOVE_COORD = re.compile(r'([a-zA-Z])(\d)')
 
 def _parse_metadata_line(obj: AT3Object, line: str):
     if not line.endswith(']'):
@@ -196,38 +197,6 @@ class Parser:
         if (move_num - prev_move_num) != 1:
             raise ParseException(f"move number must increase by 1 each time"
                                  f" ({prev_move_num=} {move_num=})")
-
-    def _parse_move_cell(self, obj: AT3Object, token: str) -> Cell:
-        """Token is like 'a1' """
-        match = RE_MOVE_COORD.match(token)
-        if not match:
-            raise ParseException(f"syntax error in move coordinate {token=}")
-
-        col_letter, row_num_str = match.groups()
-
-        col_letter = col_letter.lower()
-
-        col_idx = ord(col_letter) - ord('a')
-
-        try:
-            row_num = int(row_num_str)
-        except ValueError:
-            raise ParseException(f"row number must be a number {token=}")
-
-        row_idx = row_num - 1
-
-        return (row_idx, col_idx)
-
-    def _next_piece(self) -> None:
-        """Advance to the next piece, X -> O, O -> X"""
-        cur_piece = self.cur_piece
-        if cur_piece == Piece.X:
-            self.cur_piece = Piece.O
-        elif cur_piece == Piece.O:
-            self.cur_piece = Piece.X
-        else:
-            raise Exception(f"unknown piece ({cur_piece=})")
-
     def _parse_move_line(self, obj: AT3Object, line: str) -> None:
         """
         1. a1 2. b2
@@ -244,12 +213,12 @@ class Parser:
 
                 self.state = ParseState.MOVE_CELL
             elif self.state == ParseState.MOVE_CELL:
-                cell = self._parse_move_cell(obj, token)
+                cell = Board.parse_algebraic_cell(token)
 
                 move = Move(cell, self.cur_piece)
                 obj.moves.append(move)
 
-                self._next_piece()
+                self.cur_piece = self.cur_piece.next()
 
                 self.state = ParseState.MOVE_NUMBER
 
@@ -261,19 +230,12 @@ class Parser:
         self._check_player_choice_specified(obj)
 
     def _apply_game_choice(self, obj: AT3Object) -> None:
-        c = obj.game_choice
-        if c == GameChoice.UNDEFINED:
-            return
-        elif c == GameChoice.TIC_TAC_TOE:
-            obj.rows = 3
-            obj.cols = 3
-            obj.win_count = 3
-            obj.placement_rule = PlacementRule.ANYWHERE
-        elif c == GameChoice.CONNECT_FOUR:
-            obj.rows = 6
-            obj.cols = 7
-            obj.win_count = 4
-            obj.placement_rule = PlacementRule.COLUMN_STACK
+        params = obj.game_choice.parameters()
+        if params:
+            obj.rows = params.rows
+            obj.cols = params.cols
+            obj.win_count = params.win_count
+            obj.placement_rule = params.placement_rule
 
     def parse(self, at3_data: str, path: str | None = None) -> AT3Object:
         if self.state != ParseState.INIT:

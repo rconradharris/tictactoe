@@ -65,25 +65,3 @@ class KnownField(Enum):
 
         raise UnknownFieldException(
                 f"unknown field: '{field_name}'")
-
-
-class GameChoice(Enum):
-    """Acts as a shortcut for certain game parameters so you don't have to
-    fill in Grid, WinCount and PlacementRule explicitly.
-    """
-    UNDEFINED = auto()
-    TIC_TAC_TOE = auto()
-    CONNECT_FOUR = auto()
-
-    @classmethod
-    def from_str(cls, choice: str) -> 'GameChoice':
-        s = choice.lower()
-
-        if s == "undefined":
-            return cls.UNDEFINED
-        elif s == "tictactoe":
-            return cls.TIC_TAC_TOE
-        elif s == "connectfour":
-            return cls.CONNECT_FOUR
-
-        raise ValueError(f"unknown game choice: '{choice}'")

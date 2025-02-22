@@ -71,23 +71,14 @@ class Piece(Enum):
 
         raise ValueError(f"unknown piece: '{s}'")
 
+    def next(self) -> 'Piece':
+        """Returns the next piece in the sequence, i.e. X -> O"""
+        if self == Piece.X:
+            return Piece.O
+        elif self == Piece.O:
+            return Piece.X
 
-class PlacementRule(Enum):
-    # Tic-tac-toe like
-    ANYWHERE = auto()
-
-    # Connect Four-like
-    COLUMN_STACK = auto()
-
-    @classmethod
-    def from_str(cls, s: str) -> 'PlacementRule':
-        x = s.lower()
-        if x == "anywhere":
-            return cls.ANYWHERE
-        elif x == "columnstack":
-            return cls.COLUMN_STACK
-
-        raise ValueError(f"unknown piece placement rule: '{s}'")
+        raise Exception("only X and O pieces are sequencable")
 
 
 class GameState(Enum):
