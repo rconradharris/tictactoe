@@ -119,9 +119,9 @@ class Direction(Enum):
         elif self == Direction.E_W:
             return (0, -1)
         elif self == Direction.SW_NE:
-            return (1, -1)
-        elif self == Direction.NE_SW:
             return (-1, 1)
+        elif self == Direction.NE_SW:
+            return (1, -1)
         elif self == Direction.NW_SE:
             return (1, 1)
         elif self == Direction.SE_NW:

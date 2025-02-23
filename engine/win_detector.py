@@ -17,16 +17,6 @@ class WinDetector:
         self.board = board
         self.seq_detector = PieceSequenceDetector(board)
 
-    @property
-    def rows(self) -> int:
-        rows, _, = self.board.size
-        return rows
-
-    @property
-    def cols(self) -> int:
-        _, cols, = self.board.size
-        return cols
-
     def win(self) -> bool:
         """Return True if a winning sequence is present"""
         # - direction
@@ -46,36 +36,6 @@ class WinDetector:
             return True
 
         return False
-
-    def _cell_sequence(self, cell: Cell, row_delta: int, col_delta: int) -> Generator[Cell]:
-        """Yield cells in a direction specified by row_delta and col_delta"""
-        row, col = cell
-        sz = (self.rows, self.cols)
-
-        while True:
-            if not Board.cell_in_bounds((row, col), sz):
-                return
-
-            yield (row, col)
-
-            row += row_delta
-            col += col_delta
-
-    def _slash_cells(self, cell) -> Generator[Cell]:
-        """Yield cells in the / direction starting at (row, col)
-
-        Slashes decrement row and increment column.
-        """
-        for cell in self._cell_sequence(cell, row_delta=-1, col_delta=1):
-            yield cell
-
-    def _backslash_cells(self, cell) -> Generator[Cell]:
-        """Yield cells in the backslash direction starting at (row, col)
-
-        Backslashes increment row and increment column.
-        """
-        for cell in self._cell_sequence(cell, row_delta=1, col_delta=1):
-            yield cell
 
     def _row_win(self) -> bool:
         sz = (self.board.rows, self.board.cols)
@@ -108,83 +68,62 @@ class WinDetector:
         return False
 
     def _slash_win(self) -> bool:
-        # / down the rows
-        for ref_row in range(self.rows):
-            seq = []
-            for row, col in self._slash_cells((ref_row, 0)):
-                #print(f"{row=} {col=}")
-                piece = self.board.tbl[row][col]
-                seq.append(piece)
+        sz = (self.board.rows, self.board.cols)
+        origin = (0, 0)
 
-            #print(f"{seq=}")
-            if self._winning_sequence(seq):
-                return True
+        # Scan | down
+        for r1, c1 in _directional_scan(origin, Direction.N_S, sz):
+            self.seq_detector.reset()
 
-        # / across the columns of last row, start at 1 since we already did 0
-        # above
-        last_row_idx = self.rows - 1
-        for ref_col in range(1, self.cols):
-            seq = []
-            for row, col in self._slash_cells((last_row_idx, ref_col)):
-                #print(f"{row=} {col=}")
-                piece = self.board.tbl[row][col]
-                seq.append(piece)
+            # Scan / up
+            for r2, c2 in _directional_scan((r1, 0), Direction.SW_NE, sz):
+                piece = self.board.tbl[r2][c2]
 
-            #print(f"{seq=}")
-            if self._winning_sequence(seq):
-                return True
+                if self.seq_detector.put(piece):
+                    return True
+
+
+        # Scan - right
+        last_row_idx = self.board.rows - 1
+        for r1, c1 in _directional_scan((last_row_idx, 1), Direction.W_E, sz):
+            self.seq_detector.reset()
+
+            # Scan / up from last row, start at col 1 since we already did col 0
+            # in the previous pass
+            for r2, c2 in _directional_scan((r1, c1), Direction.SW_NE, sz):
+                piece = self.board.tbl[r2][c2]
+
+                if self.seq_detector.put(piece):
+                    return True
 
         return False
 
     def _backslash_win(self) -> bool:
-        # \ down the rows
-        for ref_row in range(self.rows):
-            seq = []
-            for row, col in self._backslash_cells((ref_row, 0)):
-                #print(f"{row=} {col=}")
-                piece = self.board.tbl[row][col]
-                seq.append(piece)
+        sz = (self.board.rows, self.board.cols)
+        origin = (0, 0)
 
-            #print(f"{seq=}")
-            if self._winning_sequence(seq):
-                return True
+        # Scan | down
+        for r1, c1 in _directional_scan(origin, Direction.N_S, sz):
+            self.seq_detector.reset()
 
-        # \ across the columns of first row, start at 1 since we already did 0
-        # above
-        for ref_col in range(1, self.cols):
-            seq = []
-            for row, col in self._backslash_cells((0, ref_col)):
-                #print(f"{row=} {col=}")
-                piece = self.board.tbl[row][col]
-                seq.append(piece)
+            # Scan \ down
+            for r2, c2 in _directional_scan((r1, 0), Direction.NW_SE, sz):
+                piece = self.board.tbl[r2][c2]
 
-            #print(f"{seq=}")
-            if self._winning_sequence(seq):
-                return True
+                if self.seq_detector.put(piece):
+                    return True
 
-        return False
 
-    def _winning_sequence(self, piece_seq: list[Piece]) -> bool:
-        """Returns True if a list of pieces (corresponding to rows, cols, or
-        diagonals) are a winning sequence: we have `win_count` in a row
-        """
-        prev_piece = None
-        run_count = 0
+        # Scan - right on first row, start at col 1 since we already did col 0
+        # in the previous pass
+        for r1, c1 in _directional_scan((0, 1), Direction.W_E, sz):
+            self.seq_detector.reset()
 
-        for piece in piece_seq:
-            if piece == Piece._:
-                run_count = 0
-            elif prev_piece is None:
-                run_count = 1
-            elif prev_piece != piece:
-                run_count = 1
-            elif prev_piece == piece:
-                run_count += 1
+            for r2, c2 in _directional_scan((r1, c1), Direction.SW_NE, sz):
+                piece = self.board.tbl[r2][c2]
 
-            if run_count >= self.board.win_count:
-                return True
-
-            prev_piece = piece
+                if self.seq_detector.put(piece):
+                    return True
 
         return False
 
