@@ -83,7 +83,7 @@ class Board:
         """
         :param coords: if True, include coordinate headings
         """
-        # If we have coordinates enabled then things will be shifte to the
+        # If we have coordinates enabled then things will be shifted to the
         # right by the coordinates on the left side
         horiz_shift = 2 if coords else 0
         horiz_blank = " " * horiz_shift

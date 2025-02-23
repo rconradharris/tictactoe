@@ -22,7 +22,7 @@
     - .c4 -> CONNECT_FOUR [DONE]
 - Replace Cat Game with Draw since connect four is supported [DONE]
 - Add Board.reset(), call in Game.reset() [DONE]
-- Improve win scanning
+- Improve win scanning [DONE]
 - 3D tic-tac-toe
 - Add at3.format()
 - Add interactive command to write at3 file

@@ -46,18 +46,55 @@ class Result(Enum):
         raise ValueError(f"unknown result: '{s}'")
 
 
+class PieceFormat(Enum):
+    ASCII_X_O = auto()
+    RED_YELLOW_CIRCLES = auto()
+    EMOJI_X_O = auto()
+
+
 class Piece(Enum):
     _ = auto() 
     X = auto()
     O = auto()  # noqa: E741 (typographically ambiguous with zero, but thats okay)
 
-    def pretty(self) -> str:
+
+    def _pretty_ascii_x_o(self) -> str:
         if self == self._:
             return "_"
         elif self == self.X:
             return "X"
         elif self == self.O:
             return "O"
+
+        return "?"
+
+    def _pretty_red_yellow_circles(self) -> str:
+        if self == self._:
+            return "_"
+        elif self == self.X:
+            return "🔴"
+        elif self == self.O:
+            return "🟡"
+
+        return "?"
+
+    def _pretty_emoji_x_o(self) -> str:
+        if self == self._:
+            return "⬛"
+        elif self == self.X:
+            return "❌"
+        elif self == self.O:
+            return "⭕"
+
+        return "?"
+
+    def pretty(self, fmt: PieceFormat = PieceFormat.ASCII_X_O) -> str:
+        if fmt == PieceFormat.ASCII_X_O:
+            return self._pretty_ascii_x_o()
+        elif fmt == PieceFormat.RED_YELLOW_CIRCLES:
+            return self._pretty_red_yellow_circles()
+        elif fmt == PieceFormat.EMOJI_X_O:
+            return self._pretty_emoji_x_o()
 
         return "?"
 
