@@ -1,13 +1,13 @@
 from typing import Generator
 
 from engine.board import Board
-from engine.enums import Piece
-from engine.typedefs import Cell
+from engine.enums import Direction, Piece
+from engine.typedefs import BoardSize, Cell
 
 
 class WinDetector:
     """
-    This class is repsonsible for detecting if a player as won the game.
+    This class is repsonsible for detecting if a player has won the game.
 
     This involves scanning in various directions according to the
     dimensionality of the board. For a 2D board, we scan horizontal, vertical,
@@ -15,6 +15,7 @@ class WinDetector:
     """
     def __init__(self, board: Board) -> None:
         self.board = board
+        self.seq_detector = PieceSequenceDetector(board)
 
     @property
     def rows(self) -> int:
@@ -60,22 +61,6 @@ class WinDetector:
             row += row_delta
             col += col_delta
 
-    def _row_cells(self, cell) -> Generator[Cell]:
-        """Yield cells in the - direction starting at (row, col)
-
-        Row direction fixes row and increments column.
-        """
-        for cell in self._cell_sequence(cell, row_delta=0, col_delta=1):
-            yield cell
-
-    def _col_cells(self, cell) -> Generator[Cell]:
-        """Yield cells in the | direction starting at (row, col)
-
-        Row direction increments row and fixes column.
-        """
-        for cell in self._cell_sequence(cell, row_delta=1, col_delta=0):
-            yield cell
-
     def _slash_cells(self, cell) -> Generator[Cell]:
         """Yield cells in the / direction starting at (row, col)
 
@@ -93,30 +78,32 @@ class WinDetector:
             yield cell
 
     def _row_win(self) -> bool:
-        for ref_row in range(self.rows):
-            seq = []
-            for row, col in self._row_cells((ref_row, 0)):
-                #print(f"{row=} {col=}")
-                piece = self.board.tbl[row][col]
-                seq.append(piece)
+        sz = (self.board.rows, self.board.cols)
+        origin = (0, 0)
 
-            #print(f"{seq=}")
-            if self._winning_sequence(seq):
-                return True
+        for r1, c1 in _directional_scan(origin, Direction.N_S, sz):
+            self.seq_detector.reset()
+
+            for r2, c2 in _directional_scan((r1, 0), Direction.W_E, sz):
+                piece = self.board.tbl[r2][c2]
+
+                if self.seq_detector.put(piece):
+                    return True
 
         return False
 
     def _col_win(self) -> bool:
-        for ref_col in range(self.cols):
-            seq = []
-            for row, col in self._col_cells((0, ref_col)):
-                #print(f"{row=} {col=}")
-                piece = self.board.tbl[row][col]
-                seq.append(piece)
+        sz = (self.board.rows, self.board.cols)
+        origin = (0, 0)
 
-            #print(f"{seq=}")
-            if self._winning_sequence(seq):
-                return True
+        for r1, c1 in _directional_scan(origin, Direction.W_E, sz):
+            self.seq_detector.reset()
+
+            for r2, c2 in _directional_scan((0, c1), Direction.N_S, sz):
+                piece = self.board.tbl[r2][c2]
+
+                if self.seq_detector.put(piece):
+                    return True
 
         return False
 
@@ -200,3 +187,54 @@ class WinDetector:
             prev_piece = piece
 
         return False
+
+
+class PieceSequenceDetector:
+    """Class for detecting if a sequence of k pieces are seen in a row
+    """
+    def __init__(self, board: Board) -> None:
+        self.board = board
+        self.reset()
+
+    def reset(self) -> None:
+        self.prev_piece: Piece | None = None
+        self.run_count: int = 0
+
+    def put(self, piece: Piece) -> bool:
+        """Returns True if the latest piece caused a win, otherwise False
+        """
+        if piece == Piece._:
+            self.run_count = 0
+        elif self.prev_piece is None:
+            self.run_count = 1
+        elif self.prev_piece != piece:
+            self.run_count = 1
+        elif self.prev_piece == piece:
+            self.run_count += 1
+
+        if self.run_count >= self.board.win_count:
+            return True
+
+        self.prev_piece = piece
+        return False
+
+
+def _directional_scan(origin: Cell,
+                      dir_: Direction,
+                      sz: BoardSize) -> Generator[Cell]:
+    """Scan cells starting at origin in the given direction until board
+    boundary is hit
+    """
+    row, col = origin
+    row_delta, col_delta = dir_.transform()
+
+    while True:
+        cell = (row, col)
+
+        if not Board.cell_in_bounds(cell, sz):
+            return
+
+        yield cell
+
+        row += row_delta
+        col += col_delta
