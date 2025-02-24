@@ -1,5 +1,5 @@
-from game.enums import Piece
 from game.exceptions import IllegalMove
+from game.piece import Piece
 from game.typedefs import Cell
 
 

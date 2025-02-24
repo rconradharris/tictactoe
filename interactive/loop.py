@@ -1,9 +1,9 @@
 from game.board import Board
-from game.enums import GameState, Piece
 from game.exceptions import CellBoundsException, IllegalMove
-from game.game import Game
+from game.game import Game, GameState
 from game.game_choice import GameChoice
 from game.move import Move
+from game.piece import Piece
 from interactive.command import Command
 from interactive.exceptions import ContinueLoop
 
@@ -46,11 +46,8 @@ def _handle_commands(g: Game, cmd_str: str) -> None:
 
 def _parse_move_cell(g: Game, cell_str: str, cur_piece: Piece) -> Move:
     """Treat move as standard algebraic notation, e.g. 'a1'"""
-    b = g.board
-    sz = (b.rows, b.cols)
-
     try:
-        cell = Board.parse_cell(cell_str, sz)
+        cell = Board.parse_cell(cell_str, g.board.size)
     except ValueError:
         # Try again
         print("error: invalid move syntax. (hint: 'a1')")
@@ -68,11 +65,8 @@ def _parse_move_c4(g: Game, cell_letter: str, cur_piece: Piece) -> Move:
     Connect Four player specify the column only and the piece 'drops' into
     place, e.g. 'c'.
     """
-    b = g.board
-    sz = (b.rows, b.cols)
-
     try:
-        col = Board.parse_column_letter(cell_letter, sz)
+        col = Board.parse_column_letter(cell_letter, g.board.size)
     except ValueError:
         # Try again
         print("error: invalid column selection (hint: 'a')")
@@ -93,7 +87,12 @@ def _parse_move_c4(g: Game, cell_letter: str, cur_piece: Piece) -> Move:
 
 def _input_move(g: Game, move_num: int, choice: GameChoice, cur_piece: Piece) -> Move:
 
-    cell_str = input(f"{move_num}. {cur_piece.pretty()} to Move: ")
+    if choice == GameChoice.CONNECT_FOUR:
+        hint = "type a column letter"
+    else:
+        hint = "type a coordinate like 'a1'"
+
+    cell_str = input(f"{move_num}. {cur_piece.pretty()} to Move (hint: {hint}): ")
 
     _handle_commands(g, cell_str)
 

@@ -3,9 +3,9 @@ import string
 
 from game.dim import within_bounds
 from game.exceptions import CellBoundsException, IllegalMove
-from game.enums import Piece
 from game.move import Move
 from game.placement_rule import PlacementRule
+from game.piece import Piece
 from game.typedefs import BoardSize, Cell
 
 RE_MOVE_CELL = re.compile(r'([a-zA-Z])(\d)')

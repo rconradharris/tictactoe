@@ -1,7 +1,18 @@
+from enum import Enum, auto
+
 from game.board import Board
-from game.enums import GameState, Player, Piece, Result
 from game.exceptions import IllegalMove
 from game.move import Move
+from game.player import Player
+from game.piece import Piece
+from game.result import Result
+
+
+class GameState(Enum):
+    INIT = auto() 
+    PLAYING = auto() 
+    FINISHED = auto()
+
 
 class Game:
     """

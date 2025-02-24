@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
 
-from game.enums import Piece, Result
 from game.game_choice import GameChoice
 from game.move import Move
 from game.placement_rule import PlacementRule
+from game.piece import Piece
+from game.result import Result
 from game.typedefs import BoardSize
 
 
