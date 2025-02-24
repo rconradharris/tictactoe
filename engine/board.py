@@ -42,20 +42,15 @@ class Board:
         self.win_detector = WinDetector(self)
         self.reset()
 
-    @property
-    def rows(self) -> int:
-        rows, _, = self.size
-        return rows
-
-    @property
-    def cols(self) -> int:
-        _, cols, = self.size
-        return cols
-
     def reset(self) -> None:
+        self._remove_pieces_from_board()
+        self.win_detector.reset()
+
+    def _remove_pieces_from_board(self) -> None:
+        rows, cols = self.size
         tbl = []
-        for _ in range(self.rows):
-            row = [Piece._ for _ in range(self.cols)]
+        for _ in range(rows):
+            row = [Piece._ for _ in range(cols)]
             tbl.append(row)
         self.tbl = tbl
 
@@ -83,6 +78,8 @@ class Board:
         """
         :param coords: if True, include coordinate headings
         """
+        _, cols = self.size
+
         # If we have coordinates enabled then things will be shifted to the
         # right by the coordinates on the left side
         horiz_shift = 2 if coords else 0
@@ -93,8 +90,8 @@ class Board:
 
         cell_width = 3
        
-        horiz_line_width = cell_width * self.cols
-        horiz_line_width += len(vert_break) * (self.cols - 1)
+        horiz_line_width = cell_width * cols
+        horiz_line_width += len(vert_break) * (cols - 1)
         horiz_line = horiz_blank + ("-" * horiz_line_width)
 
         pretty_tbl = []
@@ -102,7 +99,7 @@ class Board:
         if coords:
             low = string.ascii_lowercase
             row_heading = [
-                low[i].center(cell_width) for i in range(self.cols)]
+                low[i].center(cell_width) for i in range(cols)]
             row_heading_str = horiz_blank + blank_vert.join(row_heading)
 
             pretty_tbl.append(row_heading_str)
@@ -134,7 +131,8 @@ class Board:
 
         Returns 0 if there are no empty cells in column
         """
-        last_row_idx = self.rows - 1
+        rows, _ = self.size
+        last_row_idx = rows - 1
         for row in range(last_row_idx, 0, -1):
             piece = self.tbl[row][col]
             if piece == Piece._:
@@ -160,9 +158,8 @@ class Board:
             raise IllegalMove(f"piece cannot be blank ({m=})")
 
         b = self
-        sz = (self.rows, self.cols)
 
-        if not Board.cell_in_bounds(m.cell, sz):
+        if not Board.cell_in_bounds(m.cell, self.size):
             raise CellBoundsException(f"cell out of bounds ({m=} {b=})")
 
         r = self.tbl[m.row]

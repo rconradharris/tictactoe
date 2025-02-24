@@ -17,6 +17,9 @@ class WinDetector:
         self.board = board
         self.seq_detector = PieceSequenceDetector(board)
 
+    def reset(self) -> None:
+        self.seq_detector.reset()
+
     def win(self) -> bool:
         """Return True if a winning sequence is present"""
         # - direction
@@ -38,7 +41,7 @@ class WinDetector:
         return False
 
     def _row_win(self) -> bool:
-        sz = (self.board.rows, self.board.cols)
+        sz = self.board.size
         origin = (0, 0)
 
         for r1, c1 in _directional_scan(origin, Direction.N_S, sz):
@@ -53,7 +56,7 @@ class WinDetector:
         return False
 
     def _col_win(self) -> bool:
-        sz = (self.board.rows, self.board.cols)
+        sz = self.board.size
         origin = (0, 0)
 
         for r1, c1 in _directional_scan(origin, Direction.W_E, sz):
@@ -68,7 +71,7 @@ class WinDetector:
         return False
 
     def _slash_win(self) -> bool:
-        sz = (self.board.rows, self.board.cols)
+        sz = self.board.size
         origin = (0, 0)
 
         # Scan | down
@@ -84,7 +87,7 @@ class WinDetector:
 
 
         # Scan - right
-        last_row_idx = self.board.rows - 1
+        last_row_idx = sz[0] - 1
         for r1, c1 in _directional_scan((last_row_idx, 1), Direction.W_E, sz):
             self.seq_detector.reset()
 
@@ -99,7 +102,7 @@ class WinDetector:
         return False
 
     def _backslash_win(self) -> bool:
-        sz = (self.board.rows, self.board.cols)
+        sz = self.board.size
         origin = (0, 0)
 
         # Scan | down

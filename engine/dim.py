@@ -1,12 +1,14 @@
 """
 Utilities for working in higher dimensions
 """
-from typing import List
+from typing import List, Generator
 
 
-def within_bounds(coords: List[int],
-                  lower_bounds: List[int],
-                  upper_bounds: List[int]) -> bool:
+type Dim = List[int]
+type Point = List[int]
+
+
+def within_bounds(coords: Point, lower_bounds: Dim, upper_bounds: Dim) -> bool:
     """Returns True if the coord in N-dimensional space is within the range of
     [lower_bound, upper_bound)
     """
