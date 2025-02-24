@@ -11,6 +11,7 @@ from at3.enums import KnownField, ParseState
 from at3.file_extensions import game_choice_from_extension
 
 from game.board import Board
+from game.game import Game
 from game.game_choice import GameChoice
 from game.move import Move
 from game.placement_rule import PlacementRule
@@ -151,6 +152,7 @@ class Parser:
         self.state: ParseState = ParseState.INIT
         self.cur_piece: Piece = Piece._
         self.prev_move_num: int = 0
+        self.game: Game | None = None  # Remains `None` until metadata parsing is done
 
     def _check_state(self, allowed: list[ParseState], msg: str) -> None:
         state = self.state
@@ -214,9 +216,15 @@ class Parser:
 
                 self.state = ParseState.MOVE_CELL
             elif self.state == ParseState.MOVE_CELL:
-                cell = Board.parse_cell(token, obj.size)
+                cell = self.game.board.parse_piece_placement(token)
 
                 move = Move(cell, self.cur_piece)
+
+                # We apply moves so that if we're parsing a C4 game and the user
+                # supplies just a column letter, we know the empty row for a
+                # given column
+                self.game.apply_move(move)
+
                 obj.moves.append(move)
 
                 self.cur_piece = self.cur_piece.next()
@@ -236,6 +244,12 @@ class Parser:
             obj.size = params.size
             obj.win_count = params.win_count
             obj.placement_rule = params.placement_rule
+
+        # The Board object is capable of parsing move coordinates, so rather
+        # than reimplement that logic here, let's create a Board object and use
+        # it
+        b = Board(size=obj.size, win_count=obj.win_count, placement_rule=obj.placement_rule)
+        self.game = Game(b)
 
     def parse(self, at3_data: str, path: str | None = None) -> AT3Object:
         if self.state != ParseState.INIT:

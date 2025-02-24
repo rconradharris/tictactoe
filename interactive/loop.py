@@ -4,12 +4,14 @@ from game.game import Game, GameState
 from game.game_choice import GameChoice
 from game.move import Move
 from game.piece import Piece
+from game.placement_rule import PlacementRule
+from game.typedefs import Cell
 from interactive.command import Command
 from interactive.exceptions import ContinueLoop
 
 
-def _show_board(g: Game):
-    print(g.board.pretty(coords=True))
+def _show_board(b: Board) -> None:
+    print(b.pretty(coords=True))
     print()
 
 
@@ -28,7 +30,7 @@ MOVE SYNTAX
     C4: <column-letter> (ex: 'a')""")
 
 
-def _handle_commands(g: Game, cmd_str: str) -> None:
+def _handle_commands(b: Board, cmd_str: str) -> None:
     try:
         cmd = Command.from_str(cmd_str)
     except ValueError:
@@ -37,17 +39,17 @@ def _handle_commands(g: Game, cmd_str: str) -> None:
         return
 
     if cmd == Command.SHOW_BOARD:
-        _show_board(g)
+        _show_board(b)
         raise ContinueLoop
     elif cmd == Command.HELP:
         _show_help()
         raise ContinueLoop
 
 
-def _parse_move_cell(g: Game, cell_str: str, cur_piece: Piece) -> Move:
+def _parse_piece_placement(b: Board, cell_str: str) -> Cell:
     """Treat move as standard algebraic notation, e.g. 'a1'"""
     try:
-        cell = Board.parse_cell(cell_str, g.board.size)
+        return b.parse_piece_placement(cell_str)
     except ValueError:
         # Try again
         print("error: invalid move syntax. (hint: 'a1')")
@@ -57,54 +59,22 @@ def _parse_move_cell(g: Game, cell_str: str, cur_piece: Piece) -> Move:
         print("error: move must be on the board (hint: 'a1')")
         raise ContinueLoop
 
-    return Move(cell, cur_piece)
 
+def _input_move(b: Board, move_num: int, cur_piece: Piece) -> Cell:
 
-def _parse_move_c4(g: Game, cell_letter: str, cur_piece: Piece) -> Move:
-    """
-    Connect Four player specify the column only and the piece 'drops' into
-    place, e.g. 'c'.
-    """
-    try:
-        col = Board.parse_column_letter(cell_letter, g.board.size)
-    except ValueError:
-        # Try again
-        print("error: invalid column selection (hint: 'a')")
-        raise ContinueLoop
-    except CellBoundsException:
-        # Try again
-        print("error: column selection must be on the board (hint: 'a')")
-        raise ContinueLoop
-
-    # This simulates gravity by placing the piece on the first not empty row
-    # in that column
-    row = g.board.top_empty_row_for_column(col)
-
-    cell = (row, col)
-
-    return Move(cell, cur_piece)
-
-
-def _input_move(g: Game, move_num: int, choice: GameChoice, cur_piece: Piece) -> Move:
-
-    if choice == GameChoice.CONNECT_FOUR:
+    if b.placement_rule == PlacementRule.COLUMN_STACK:
         hint = "type a column letter"
     else:
         hint = "type a coordinate like 'a1'"
 
     cell_str = input(f"{move_num}. {cur_piece.pretty()} to Move (hint: {hint}): ")
 
-    _handle_commands(g, cell_str)
+    _handle_commands(b, cell_str)
 
-    if choice == GameChoice.CONNECT_FOUR:
-        move = _parse_move_c4(g, cell_str, cur_piece)
-    else:
-        move = _parse_move_cell(g, cell_str, cur_piece)
-
-    return move
+    return _parse_piece_placement(b, cell_str)
 
 
-def _game_loop(g: Game, choice: GameChoice) -> None:
+def _game_loop(g: Game) -> None:
     while True:
         piece_str = input("Choose 'X' or 'O': ")
         piece_str = piece_str.upper()
@@ -117,7 +87,7 @@ def _game_loop(g: Game, choice: GameChoice) -> None:
         else:
             break
 
-    _show_board(g)
+    _show_board(g.board)
 
     move_num = 1
     while True:
@@ -125,9 +95,11 @@ def _game_loop(g: Game, choice: GameChoice) -> None:
             break
 
         try:
-            move = _input_move(g, move_num, choice, cur_piece)
+            cell = _input_move(g.board, move_num, cur_piece)
         except ContinueLoop:
             continue
+
+        move = Move(cell, cur_piece)
 
         try:
             g.apply_move(move)
@@ -136,7 +108,7 @@ def _game_loop(g: Game, choice: GameChoice) -> None:
             print(e)
             continue
 
-        _show_board(g)
+        _show_board(g.board)
 
         move_num += 1
         cur_piece = cur_piece.next()
@@ -168,4 +140,4 @@ def start_loop() -> None:
 
     g = Game(b)
 
-    _game_loop(g, choice)
+    _game_loop(g)

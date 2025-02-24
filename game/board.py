@@ -171,8 +171,7 @@ class Board:
 
         r[m.col] = m.piece
 
-    @classmethod
-    def parse_column_letter(cls, col_letter: str, sz: BoardSize) -> int:
+    def _parse_column_letter(self, col_letter: str) -> int:
         """Returns index associated with a given column letter
 
         For example, 'a' return 0, 'b' returns 1, etc...
@@ -186,27 +185,22 @@ class Board:
 
         col = ord(col_letter) - ord('a')
 
-        _, cols = sz
+        _, cols = self.size
         on_board = (0 <= col < cols)
         if not on_board:
             raise CellBoundsException(f"cell out of bounds {col_letter=}")
 
         return col
 
-    @classmethod
-    def parse_cell(cls, token: str, sz: BoardSize) -> Cell:
-        """Token is like 'a1'
-
-        Rows and Cols defines the max indices of respectively so we can
-        enforce bounds checking.
-        """
+    def _parse_cell(self, token: str) -> Cell:
+        """Token is like 'a1'"""
         match = RE_MOVE_CELL.match(token)
         if not match:
             raise ValueError(f"syntax error in move coordinate {token=}")
 
         col_letter, row_num_str = match.groups()
 
-        col_idx = cls.parse_column_letter(col_letter, sz)
+        col_idx = self._parse_column_letter(col_letter)
 
         try:
             row_num = int(row_num_str)
@@ -217,7 +211,28 @@ class Board:
 
         cell = (row_idx, col_idx)
 
-        if not cls.cell_in_bounds(cell, sz):
+        if not Board.cell_in_bounds(cell, self.size):
             raise CellBoundsException(f"cell out of bounds {token=}")
 
         return cell
+
+    def parse_piece_placement(self, token: str) -> Cell:
+        """
+        A placement is a token which describes where to place a piece on the board.
+
+        For games like tic-tac-toe where the placement rule is ANYWHERE, the
+        placement must be a coordinate, like 'a1'.
+
+        For games like Connect Four where the placement rule is COLUMN_STACK,
+        then only a column letter is necessary. Coordinates are also allowed in
+        these cases as well.
+        """
+        if self.placement_rule == PlacementRule.COLUMN_STACK and len(token) == 1:
+            col = self._parse_column_letter(token)
+
+            # This simulates gravity by placing the piece on the first not empty row
+            # in that column
+            row = self.top_empty_row_for_column(col)
+            return (row, col)
+
+        return self._parse_cell(token)
