@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 
-from engine.enums import Piece, Result
-from engine.game_choice import GameChoice
-from engine.move import Move
-from engine.placement_rule import PlacementRule
-from engine.typedefs import BoardSize
+from game.enums import Piece, Result
+from game.game_choice import GameChoice
+from game.move import Move
+from game.placement_rule import PlacementRule
+from game.typedefs import BoardSize
 
 
 @dataclass

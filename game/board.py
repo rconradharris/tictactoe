@@ -1,12 +1,12 @@
 import re
 import string
 
-from engine.dim import within_bounds
-from engine.exceptions import CellBoundsException, IllegalMove
-from engine.enums import Piece
-from engine.move import Move
-from engine.placement_rule import PlacementRule
-from engine.typedefs import BoardSize, Cell
+from game.dim import within_bounds
+from game.exceptions import CellBoundsException, IllegalMove
+from game.enums import Piece
+from game.move import Move
+from game.placement_rule import PlacementRule
+from game.typedefs import BoardSize, Cell
 
 RE_MOVE_CELL = re.compile(r'([a-zA-Z])(\d)')
 
@@ -34,7 +34,7 @@ class Board:
         :param placement_rule: constraint on where pieces can be placed
         """
         # Avoid circular import since WinDetector depends on having a Board
-        from engine.win_detector import WinDetector
+        from game.win_detector import WinDetector
 
         self.size: BoardSize = size
         self.win_count: int = win_count

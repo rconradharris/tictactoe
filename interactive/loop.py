@@ -1,9 +1,9 @@
-from engine.board import Board
-from engine.enums import GameState, Piece
-from engine.exceptions import CellBoundsException, IllegalMove
-from engine.game import Game
-from engine.game_choice import GameChoice
-from engine.move import Move
+from game.board import Board
+from game.enums import GameState, Piece
+from game.exceptions import CellBoundsException, IllegalMove
+from game.game import Game
+from game.game_choice import GameChoice
+from game.move import Move
 from interactive.command import Command
 from interactive.exceptions import ContinueLoop
 

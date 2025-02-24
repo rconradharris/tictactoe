@@ -1,6 +1,6 @@
-from engine.enums import Piece
-from engine.exceptions import IllegalMove
-from engine.typedefs import Cell
+from game.enums import Piece
+from game.exceptions import IllegalMove
+from game.typedefs import Cell
 
 
 class Move:

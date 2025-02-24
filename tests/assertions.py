@@ -1,6 +1,6 @@
 from at3.at3_object import AT3Object
-from engine.enums import GameState, Result
-from engine.game import Game
+from game.enums import GameState, Result
+from game.game import Game
 from tests.context import TestContext
 
 

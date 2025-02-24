@@ -2,8 +2,8 @@ import os
 
 from at3.file_extensions import valid_file_extension
 from at3.parse import parse
-from engine.board import Board
-from engine.game import Game
+from game.board import Board
+from game.game import Game
 from tests.assertions import assert_game_result_matches_file
 from tests.context import TestContext
 

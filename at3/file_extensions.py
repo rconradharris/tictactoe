@@ -1,6 +1,6 @@
 import os
 
-from engine.game_choice import GameChoice
+from game.game_choice import GameChoice
 
 _extensions: dict[str, GameChoice] = {
     ".at3": GameChoice.UNDEFINED,

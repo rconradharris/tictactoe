@@ -1,8 +1,8 @@
 from typing import Generator
 
-from engine.board import Board
-from engine.enums import Direction, Piece
-from engine.typedefs import BoardSize, Cell
+from game.board import Board
+from game.enums import Direction, Piece
+from game.typedefs import BoardSize, Cell
 
 
 class WinDetector:

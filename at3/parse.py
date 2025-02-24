@@ -10,11 +10,11 @@ from at3.exceptions import (
 from at3.enums import KnownField, ParseState
 from at3.file_extensions import game_choice_from_extension
 
-from engine.board import Board
-from engine.enums import Player, Piece, Result
-from engine.game_choice import GameChoice
-from engine.move import Move
-from engine.placement_rule import PlacementRule
+from game.board import Board
+from game.enums import Player, Piece, Result
+from game.game_choice import GameChoice
+from game.move import Move
+from game.placement_rule import PlacementRule
 
 
 RE_METADATA_LINE = re.compile(r'\s*\[(\w+)\s+\"(.+)\"\]\s*')

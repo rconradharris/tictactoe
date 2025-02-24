@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from engine.placement_rule import PlacementRule
-from engine.typedefs import BoardSize
+from game.placement_rule import PlacementRule
+from game.typedefs import BoardSize
 
 
 @dataclass

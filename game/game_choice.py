@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
-from engine.game_parameters import GameParameters
-from engine.placement_rule import PlacementRule
+from game.game_parameters import GameParameters
+from game.placement_rule import PlacementRule
 
 
 class GameChoice(Enum):

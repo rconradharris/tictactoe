@@ -1,7 +1,7 @@
-from engine.board import Board
-from engine.enums import GameState, Player, Piece, Result
-from engine.exceptions import IllegalMove
-from engine.move import Move
+from game.board import Board
+from game.enums import GameState, Player, Piece, Result
+from game.exceptions import IllegalMove
+from game.move import Move
 
 class Game:
     """
