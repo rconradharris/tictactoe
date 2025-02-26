@@ -6,7 +6,7 @@ class Engine:
     """
     Abstract base class for an engine capable of playing tic-tac-toe.
     """
-    def __init__(self, g: Game, p: Player) -> None
+    def __init__(self, g: Game, p: Player) -> None:
         """
         :param g: The game object
         :param p: Which player the computer is
@@ -14,6 +14,6 @@ class Engine:
         self.game: Game = g
         self.player : Player = p
 
-    def move(self) -> Move:
+    def generate_move(self) -> Move:
         """Produce the next move"""
         raise NotImplemented

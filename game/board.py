@@ -42,6 +42,11 @@ class Board:
         self.win_detector = WinDetector(self)
         self.reset()
 
+    def cell_value(self, cell: Cell) -> Piece:
+        """Return the piece at the given cell location"""
+        row, col = cell
+        return self.tbl[row][col]
+
     def reset(self) -> None:
         self._remove_pieces_from_board()
         self.win_detector.reset()

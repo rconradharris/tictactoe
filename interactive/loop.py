@@ -1,3 +1,4 @@
+from engine.t3.dummy import Dummy
 from game.board import Board
 from game.exceptions import CellBoundsException, IllegalMove
 from game.game import Game, GameState
@@ -5,6 +6,7 @@ from game.game_choice import GameChoice
 from game.move import Move
 from game.piece import Piece
 from game.placement_rule import PlacementRule
+from game.player import Player
 from game.typedefs import Cell
 from interactive.command import Command
 from interactive.exceptions import ContinueLoop
@@ -60,14 +62,14 @@ def _parse_move(g: Game, cell_str: str) -> Move:
         raise ContinueLoop
 
 
-def _input_move(g: Game, move_num: int, cur_piece: Piece) -> Move:
+def _input_move(g: Game) -> Move:
 
     if g.board.placement_rule == PlacementRule.COLUMN_STACK:
         hint = "type a column letter"
     else:
         hint = "type a coordinate like 'a1'"
 
-    cell_str = input(f"{move_num}. {g.cur_piece.pretty()} to Move (hint: {hint}): ")
+    cell_str = input(f"{g.move_num}. {g.cur_piece.pretty()} to Move (hint: {hint}): ")
 
     _handle_commands(g.board, cell_str)
 
@@ -79,7 +81,7 @@ def _game_loop(g: Game) -> None:
         piece_str = input("Choose 'X' or 'O': ")
         piece_str = piece_str.upper()
         try:
-            cur_piece = Piece.from_str(piece_str)
+            player1_piece = Piece.from_str(piece_str)
         except ValueError as e:
             # Try again
             print(e)
@@ -87,19 +89,23 @@ def _game_loop(g: Game) -> None:
         else:
             break
 
-    g.choose_player1_piece(cur_piece)
+    g.choose_player1_piece(player1_piece)
+
+    engine = Dummy(g, Player.P2)
 
     _show_board(g.board)
 
-    move_num = 1
     while True:
         if g.state == GameState.FINISHED:
             break
 
-        try:
-            move = _input_move(g, move_num, cur_piece)
-        except ContinueLoop:
-            continue
+        if engine.player == g.cur_player:
+            move = engine.generate_move()
+        else:
+            try:
+                move = _input_move(g)
+            except ContinueLoop:
+                continue
 
         try:
             g.apply_move(move)
@@ -109,9 +115,6 @@ def _game_loop(g: Game) -> None:
             continue
 
         _show_board(g.board)
-
-        move_num += 1
-        cur_piece = cur_piece.next()
 
     print(g.result)
 
@@ -139,5 +142,4 @@ def start_loop() -> None:
         )
 
     g = Game(b)
-
     _game_loop(g)

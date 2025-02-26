@@ -35,6 +35,11 @@ class Game:
         self.board.reset()
 
     @property
+    def move_num(self) -> int:
+        """Return the current move number (starting from 1)"""
+        return len(self.move_history) + 1
+
+    @property
     def cur_piece(self) -> Piece:
         """Return Piece associated with the current player on-move"""
         return self._player2piece[self.cur_player]

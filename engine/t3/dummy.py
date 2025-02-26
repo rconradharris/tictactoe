@@ -1,17 +1,35 @@
+from random import choice
+from typing import List
+
 from engine.engine import Engine
+from game.game import Game
 from game.move import Move
 from game.piece import Piece
+from game.player import Player
+from game.typedefs import Cell
+
 
 class Dummy(Engine):
     """
-    A dummy is an engine that selects a random move and attempts to play it
-    without regard to whether the move is legal or good.
-
-    If the move is illegal, the dummy will try another random move.
-
-    The only sensibility of dummy is to not play the same move twice.
+    The Dummy engine plays a move to a random blank cell.
     """
+    def _blank_cells(self) -> List[Cell]:
+        g = self.game
+        b = g.board
+        rows, cols = g.board.size
 
-    def move(self) -> Move:
-        # TODO: fill this out...
-        return Move(0, 0, Piece.X)
+        blanks: List[Cell] = []
+
+        for row in range(rows):
+            for col in range(cols):
+                cell = (row, col)
+                p = b.cell_value(cell)
+                if p == Piece._:
+                    blanks.append(cell)
+
+        return blanks
+
+    def generate_move(self) -> Move:
+        blanks = self._blank_cells()
+        cell = choice(blanks)
+        return Move(cell, self.game.cur_piece)
