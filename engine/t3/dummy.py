@@ -9,7 +9,7 @@ from game.player import Player
 from game.typedefs import Cell
 
 
-class Dummy(Engine):
+class T3Dummy(Engine):
     """
     The Dummy engine plays a move to a random blank cell.
     """

@@ -1,4 +1,6 @@
-from engine.t3.dummy import Dummy
+from engine.engine import Engine
+from engine.t3.dummy import T3Dummy
+from engine.c4.dummy import C4Dummy
 from game.board import Board
 from game.exceptions import CellBoundsException, IllegalMove
 from game.game import Game, GameState
@@ -63,8 +65,8 @@ def _parse_move(g: Game, cell_str: str) -> Move:
 
 
 def _input_move(g: Game) -> Move:
-
-    if g.board.placement_rule == PlacementRule.COLUMN_STACK:
+    pr = g.board.placement_rule
+    if pr == PlacementRule.COLUMN_STACK:
         hint = "type a column letter"
     else:
         hint = "type a coordinate like 'a1'"
@@ -76,31 +78,32 @@ def _input_move(g: Game) -> Move:
     return _parse_move(g, cell_str)
 
 
-def _game_loop(g: Game) -> None:
-    while True:
-        piece_str = input("Choose 'X' or 'O': ")
-        piece_str = piece_str.upper()
-        try:
-            player1_piece = Piece.from_str(piece_str)
-        except ValueError as e:
-            # Try again
-            print(e)
-            continue
-        else:
-            break
+def _pick_engine(g: Game, p: Player.P2) -> Engine:
+    """
+    We pick the engine based on PlacementRule rather GameChoice because we
+    want the same engine to play grid sizes. So, for example, the even though
+    its called the T3 engine, it can also play 4x4 grids. It's characteristic
+    is playing a move ANYHWERE.
 
-    g.choose_player1_piece(player1_piece)
+    Simiarly, the C4 engine can play any size Connect Four board. It's
+    characteristic is placing pieces in a ColumnStack.
+    """
+    pr = g.board.placement_rule
+    if pr == PlacementRule.ANYWHERE:
+        return T3Dummy(g, p)
+    elif pr == PlacementRule.COLUMN_STACK:
+        return C4Dummy(g, p)
 
-    engine = Dummy(g, Player.P2)
+    raise ValueError("no engine found for placement rule")
 
-    _show_board(g.board)
 
+def _game_loop(g: Game, eng: Engine) -> None:
     while True:
         if g.state == GameState.FINISHED:
             break
 
-        if engine.player == g.cur_player:
-            move = engine.generate_move()
+        if eng.player == g.cur_player:
+            move = eng.generate_move()
         else:
             try:
                 move = _input_move(g)
@@ -142,4 +145,25 @@ def start_loop() -> None:
         )
 
     g = Game(b)
-    _game_loop(g)
+
+    while True:
+        piece_str = input("Choose 'X' or 'O': ")
+        piece_str = piece_str.upper()
+        try:
+            player1_piece = Piece.from_str(piece_str)
+        except ValueError as e:
+            # Try again
+            print(e)
+            continue
+        else:
+            break
+
+    g.choose_player1_piece(player1_piece)
+
+    # FIXME: right now the engine is always player 2, but this should be
+    # configurable
+    eng = _pick_engine(g, Player.P2)
+
+    _show_board(g.board)
+
+    _game_loop(g, eng)
