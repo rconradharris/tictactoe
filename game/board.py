@@ -137,16 +137,15 @@ class Board:
     def top_empty_row_for_column(self, col: int) -> int:
         """Return the row for the 'top' empty cell in a column
 
-        Returns 0 if there are no empty cells in column
+        Returns -1 if there are no empty cells in column
         """
         rows, _ = self.size
-        last_row_idx = rows - 1
-        for row in range(last_row_idx, 0, -1):
+        for idx in range(rows):
+            row = rows - idx - 1
             piece = self._tbl[row][col]
             if piece == Piece._:
                 return row
-
-        return 0 
+        return -1
 
     def _check_column_stack(self, m: Move) -> None:
         row = self.top_empty_row_for_column(m.col)

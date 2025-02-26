@@ -6,8 +6,11 @@ play:
 debug:
 	uv run main.py debug
 
-test:
-	uv run main.py test ${TEST}
+battle:
+	uv run main.py battle
+
+file_test:
+	uv run main.py file_test ${TEST}
 
 .PHONY: tests
 tests:

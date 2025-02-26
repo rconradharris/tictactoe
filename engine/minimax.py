@@ -2,19 +2,62 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import List
 
+from engine.engine import Engine
 from game.game import Game
 from game.move import Move
 from game.player import Player
+
+"""
+Traceback (most recent call last):
+  File "/Users/rick/code/tictactoe/main.py", line 101, in <module>
+    main()
+    ~~~~^^
+  File "/Users/rick/code/tictactoe/main.py", line 84, in main
+    battle()
+    ~~~~~~^^
+  File "/Users/rick/code/tictactoe/main.py", line 44, in battle
+    m = eng.generate_move()
+  File "/Users/rick/code/tictactoe/engine/minimax.py", line 29, in generate_move
+    m = best_move(self.game, self.max_plies, fn)
+  File "/Users/rick/code/tictactoe/engine/minimax.py", line 43, in best_move
+    minimax(t.root, 3, maximizer, fn)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rick/code/tictactoe/engine/minimax.py", line 117, in minimax
+    assert node.move is not None
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+"""
+
+class RandiMaxer(Engine):
+    """RandiMaxer is a game engine that uses the minimax algorithm to select
+    moves but is rather stupid in that it uses an evaluation function which
+    assigns a random score to each move.
+    """
+    DEFAULT_PLIES = 2
+    def __init__(self, g: Game, p: Player, max_plies: int=DEFAULT_PLIES) -> None:
+        """
+        :param g: The game object
+        :param p: Which player the computer is
+        """
+        self.game: Game = g
+        self.player: Player = p
+        self.max_plies: int = max_plies
+
+    def generate_move(self) -> Move:
+        """Produce the next move"""
+        fn = eval_rand
+        m = best_move(self.game, self.max_plies, fn)
+        return m
 
 
 type EvalFn = Callable[[Game, Move], float]
 
 
-def best_move(g: Game, num_plies: int, fn: EvalFn) -> Move:
+def best_move(g: Game, max_plies: int, fn: EvalFn) -> Move:
     """Return the current player's best move according to the evaluation
     function
     """
-    t = GameTree.from_game(g, num_plies)
+    t = GameTree.from_game(g, max_plies)
     maximizer = g.cur_player == Player.P1
 
     minimax(t.root, 3, maximizer, fn)
@@ -47,7 +90,7 @@ class Node:
 
 
 
-def rand_eval(g: Game, m: Move) -> float:
+def eval_rand(g: Game, m: Move) -> float:
     """This is in 'piece' units; so 2.0 is like player 1 having an extra
     piece. Likewise, -1.5 is like player 2 having the equivalent of an
     extra piece an a half.
@@ -70,6 +113,7 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
     p = g.cur_piece
 
     for cell in g.board.playable_cells():
+        print(cell)
         m = Move(cell, p)
         child = Node(g.copy(), m)
         cur_node.children.append(child)
@@ -81,10 +125,10 @@ class GameTree:
     root: Node
 
     @classmethod
-    def from_game(cls, g: Game, num_plies: int) -> 'GameTree':
+    def from_game(cls, g: Game, max_plies: int) -> 'GameTree':
         root = Node(g.copy())
         t = GameTree(root)
-        _build_subtree(root, num_plies)
+        _build_subtree(root, max_plies)
         return t
 
 
