@@ -1,6 +1,8 @@
+from typing import List
 from at3.at3_object import AT3Object
 from game.game import Game, GameState
 from game.result import Result
+from game.typedefs import Cell
 from tests.context import TestContext
 
 
@@ -23,3 +25,5 @@ def assert_game_result_matches_file(t: TestContext, obj: AT3Object, g: Game) -> 
         assert_result(t, obj.result, g.result)
 
 
+def assert_cells(t: TestContext, wanted: List[Cell], got: List[Cell]) -> None:
+    assert wanted == got, f"'{t.description}': {wanted=} , {got=} instead"

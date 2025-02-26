@@ -7,26 +7,6 @@ from game.game import Game
 from game.move import Move
 from game.player import Player
 
-"""
-Traceback (most recent call last):
-  File "/Users/rick/code/tictactoe/main.py", line 101, in <module>
-    main()
-    ~~~~^^
-  File "/Users/rick/code/tictactoe/main.py", line 84, in main
-    battle()
-    ~~~~~~^^
-  File "/Users/rick/code/tictactoe/main.py", line 44, in battle
-    m = eng.generate_move()
-  File "/Users/rick/code/tictactoe/engine/minimax.py", line 29, in generate_move
-    m = best_move(self.game, self.max_plies, fn)
-  File "/Users/rick/code/tictactoe/engine/minimax.py", line 43, in best_move
-    minimax(t.root, 3, maximizer, fn)
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/rick/code/tictactoe/engine/minimax.py", line 117, in minimax
-    assert node.move is not None
-           ^^^^^^^^^^^^^^^^^^^^^
-AssertionError
-"""
 
 class RandiMaxer(Engine):
     """RandiMaxer is a game engine that uses the minimax algorithm to select
@@ -113,7 +93,6 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
     p = g.cur_piece
 
     for cell in g.board.playable_cells():
-        print(cell)
         m = Move(cell, p)
         child = Node(g.copy(), m)
         cur_node.children.append(child)

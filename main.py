@@ -1,6 +1,7 @@
 from collections import Counter
 import sys
 
+from game.game_choice import GameChoice
 from game.result import Result
 from interactive.loop import start_loop
 from tests.file_tests import run_file_test
@@ -12,7 +13,9 @@ def debug():
     pass
 
 
-def battle(num_games: int = 1):
+def battle(choice: GameChoice = GameChoice.TIC_TAC_TOE,
+           num_games: int = 1000,
+           verbose: bool = False):
     """Have two engines play each other"""
     from engine.minimax import RandiMaxer
     from game.board import Board
@@ -22,8 +25,6 @@ def battle(num_games: int = 1):
     from game.piece import Piece
     from game.player import Player
 
-    #choice = GameChoice.TIC_TAC_TOE
-    choice = GameChoice.CONNECT_FOUR
     params = choice.parameters()
     assert params is not None
     b = Board.from_game_parameters(params)
@@ -47,9 +48,10 @@ def battle(num_games: int = 1):
 
             g.apply_move(m)
 
-            print(f"{g.state=} {g.result=}")
-            print(g.board.pretty(coords=True))
-            print()
+            if verbose:
+                print(f"{g.state=} {g.result=}")
+                print(g.board.pretty(coords=True))
+                print()
 
         print(f"Game {game_num}/{num_games} result: {g.result}")
         result_stats[g.result] += 1

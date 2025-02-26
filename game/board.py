@@ -260,12 +260,9 @@ class Board:
 
         # Most efficient to scan column-wise, bottom up
         for col in range(cols):
-            for row_one_indexed in range(rows, 1, -1):
-                row = row_one_indexed - 1  # Zero indexed
-                cell = (row, col)
-                p = self.cell_value(cell)
-                if p == Piece._:
-                    yield col
+            row = self.top_empty_row_for_column(col)
+            if row >= 0:
+                yield col
 
     def playable_cells(self) -> Generator[Cell]:
         """Yield all cells which are playable on the board given the specified
