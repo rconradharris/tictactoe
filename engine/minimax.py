@@ -2,32 +2,9 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import List
 
-from engine.engine import Engine
 from game.game import Game
 from game.move import Move
 from game.player import Player
-
-
-class RandiMaxer(Engine):
-    """RandiMaxer is a game engine that uses the minimax algorithm to select
-    moves but is rather stupid in that it uses an evaluation function which
-    assigns a random score to each move.
-    """
-    DEFAULT_PLIES = 2
-    def __init__(self, g: Game, p: Player, max_plies: int=DEFAULT_PLIES) -> None:
-        """
-        :param g: The game object
-        :param p: Which player the computer is
-        """
-        self.game: Game = g
-        self.player: Player = p
-        self.max_plies: int = max_plies
-
-    def generate_move(self) -> Move:
-        """Produce the next move"""
-        fn = eval_rand
-        m = best_move(self.game, self.max_plies, fn)
-        return m
 
 
 type EvalFn = Callable[[Game, Move], float]
@@ -68,17 +45,6 @@ class Node:
     children: List['Node'] = field(default_factory=list)
 
 
-
-
-def eval_rand(g: Game, m: Move) -> float:
-    """This is in 'piece' units; so 2.0 is like player 1 having an extra
-    piece. Likewise, -1.5 is like player 2 having the equivalent of an
-    extra piece an a half.
-
-    ~0.0 is considered draw-ish.
-    """
-    from random import uniform
-    return uniform(-1.0, 1.0)
 
 
 def _build_subtree(cur_node: Node, num_plies: int) -> None:

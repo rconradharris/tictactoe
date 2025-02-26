@@ -1,18 +1,19 @@
+from dataclasses import dataclass
+
 from game.game import Game
 from game.move import Move
 from game.player import Player
 
+@dataclass
 class Engine:
     """
-    Abstract base class for an engine capable of playing tic-tac-toe.
+    Abstract base class for an engine capable of playing an m,n,k game
     """
-    def __init__(self, g: Game, p: Player) -> None:
-        """
-        :param g: The game object
-        :param p: Which player the computer is
-        """
-        self.game: Game = g
-        self.player : Player = p
+    DEFAULT_PLIES = 2
+
+    game: Game
+    player: Player
+    max_plies: int = DEFAULT_PLIES
 
     def generate_move(self) -> Move:
         """Produce the next move"""

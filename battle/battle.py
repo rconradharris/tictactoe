@@ -1,6 +1,6 @@
 from collections import Counter
 
-from engine.minimax import RandiMaxer
+from engine.randimaxer import Randimaxer
 from game.board import Board
 from engine.engine import Engine
 from game.game import Game, GameState
@@ -23,8 +23,8 @@ def do_battle(
     g = Game(b)
 
     p2eng: dict[Player, Engine] = {}
-    p2eng[Player.P1] = RandiMaxer(g, Player.P1)
-    p2eng[Player.P2] = RandiMaxer(g, Player.P2)
+    p2eng[Player.P1] = Randimaxer(g, Player.P1)
+    p2eng[Player.P2] = Randimaxer(g, Player.P2)
 
     result_stats: Counter = Counter()
 
