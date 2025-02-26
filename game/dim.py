@@ -1,7 +1,7 @@
 """
 Utilities for working in higher dimensions
 """
-from typing import List, Generator
+from typing import List
 
 
 type Dim = List[int]

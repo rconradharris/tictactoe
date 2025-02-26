@@ -56,9 +56,9 @@ class WinDetector:
     dimensionality of the board. For a 2D board, we scan horizontal, vertical,
     forward slash diagonally and backslash diagonally.
     """
-    def __init__(self, board: Board) -> None:
-        self.board = board
-        self.seq_detector = PieceSequenceDetector(board)
+    def __init__(self, b: Board) -> None:
+        self.board = b
+        self.seq_detector = PieceSequenceDetector(b)
 
     def reset(self) -> None:
         self.seq_detector.reset()
@@ -91,7 +91,7 @@ class WinDetector:
             self.seq_detector.reset()
 
             for r2, c2 in _directional_scan((r1, 0), Direction.W_E, sz):
-                piece = self.board.tbl[r2][c2]
+                piece = self.board.cell_value((r2, c2))
 
                 if self.seq_detector.put(piece):
                     return True
@@ -106,7 +106,7 @@ class WinDetector:
             self.seq_detector.reset()
 
             for r2, c2 in _directional_scan((0, c1), Direction.N_S, sz):
-                piece = self.board.tbl[r2][c2]
+                piece = self.board.cell_value((r2, c2))
 
                 if self.seq_detector.put(piece):
                     return True
@@ -123,7 +123,7 @@ class WinDetector:
 
             # Scan / up
             for r2, c2 in _directional_scan((r1, 0), Direction.SW_NE, sz):
-                piece = self.board.tbl[r2][c2]
+                piece = self.board.cell_value((r2, c2))
 
                 if self.seq_detector.put(piece):
                     return True
@@ -137,7 +137,7 @@ class WinDetector:
             # Scan / up from last row, start at col 1 since we already did col 0
             # in the previous pass
             for r2, c2 in _directional_scan((r1, c1), Direction.SW_NE, sz):
-                piece = self.board.tbl[r2][c2]
+                piece = self.board.cell_value((r2, c2))
 
                 if self.seq_detector.put(piece):
                     return True
@@ -154,7 +154,7 @@ class WinDetector:
 
             # Scan \ down
             for r2, c2 in _directional_scan((r1, 0), Direction.NW_SE, sz):
-                piece = self.board.tbl[r2][c2]
+                piece = self.board.cell_value((r2, c2))
 
                 if self.seq_detector.put(piece):
                     return True
@@ -166,7 +166,7 @@ class WinDetector:
             self.seq_detector.reset()
 
             for r2, c2 in _directional_scan((r1, c1), Direction.SW_NE, sz):
-                piece = self.board.tbl[r2][c2]
+                piece = self.board.cell_value((r2, c2))
 
                 if self.seq_detector.put(piece):
                     return True

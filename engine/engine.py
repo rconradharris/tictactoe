@@ -16,4 +16,4 @@ class Engine:
 
     def generate_move(self) -> Move:
         """Produce the next move"""
-        raise NotImplemented
+        raise NotImplementedError

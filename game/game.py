@@ -1,12 +1,17 @@
 from enum import Enum, auto
+from typing import Generator
 
 from game.board import Board
-from game.exceptions import IllegalMove, PieceSelectionsAlreadyMade
+from game.exceptions import (
+    IllegalMove,
+    PieceSelectionsAlreadyMade,
+    PieceSelectionException,
+    InvalidPieceSelection,
+)
 from game.move import Move
 from game.player import Player
 from game.piece import Piece
 from game.result import Result
-from game.typedefs import Cell
 
 
 class GameState(Enum):
@@ -139,3 +144,26 @@ class Game:
         """
         cell = self.board.parse_piece_placement(placement_location)
         return Move(cell, self.cur_piece)
+
+    def possible_moves(self) -> Generator[Move]:
+        """Generate all possible moves for the current player"""
+        for cell in self.board.playable_cells():
+            yield Move(cell, self.cur_piece)
+
+    def copy(self) -> 'Game':
+        """Make a full copy of a game"""
+        g1 = self
+
+        # Use a dummy board to initialize, we'll overwrite with a proper copy
+        # of the Board object afterward. This keeps initialization semantics
+        # clean
+        g2 = Game(Board())
+
+        g2.cur_player = g1.cur_player
+        g2._player2piece = g1._player2piece.copy()
+        g2._piece2player = g1._piece2player.copy()
+        g2.state = g1.state
+        g2.result = g1.result
+        g2.move_history = g1.move_history.copy()
+        g2.board = g1.board.copy()
+        return g2

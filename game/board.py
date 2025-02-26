@@ -1,8 +1,10 @@
 import re
 import string
+from typing import Generator
 
 from game.dim import within_bounds
 from game.exceptions import CellBoundsException, IllegalMove
+from game.game_parameters import GameParameters
 from game.move import Move
 from game.placement_rule import PlacementRule
 from game.piece import Piece
@@ -45,7 +47,7 @@ class Board:
     def cell_value(self, cell: Cell) -> Piece:
         """Return the piece at the given cell location"""
         row, col = cell
-        return self.tbl[row][col]
+        return self._tbl[row][col]
 
     def reset(self) -> None:
         self._remove_pieces_from_board()
@@ -57,11 +59,11 @@ class Board:
         for _ in range(rows):
             row = [Piece._ for _ in range(cols)]
             tbl.append(row)
-        self.tbl = tbl
+        self._tbl = tbl
 
     def full(self) -> bool:
         """Return True if the board is full of pieces"""
-        for row in self.tbl:
+        for row in self._tbl:
             for piece in row:
                 if piece == Piece._:
                     return False
@@ -109,7 +111,7 @@ class Board:
 
             pretty_tbl.append(row_heading_str)
 
-        for idx, row in enumerate(self.tbl):
+        for idx, row in enumerate(self._tbl):
             pretty_row = []
             for piece in row:
                 piece_str = piece.pretty().center(cell_width)
@@ -124,7 +126,7 @@ class Board:
 
             pretty_tbl.append(pretty_row_str)
 
-            last_row = idx == len(self.tbl) - 1
+            last_row = idx == len(self._tbl) - 1
             if not last_row:
                 pretty_tbl.append(horiz_line)
 
@@ -139,7 +141,7 @@ class Board:
         rows, _ = self.size
         last_row_idx = rows - 1
         for row in range(last_row_idx, 0, -1):
-            piece = self.tbl[row][col]
+            piece = self._tbl[row][col]
             if piece == Piece._:
                 return row
 
@@ -167,7 +169,7 @@ class Board:
         if not Board.cell_in_bounds(m.cell, self.size):
             raise CellBoundsException(f"cell out of bounds ({m=} {b=})")
 
-        r = self.tbl[m.row]
+        r = self._tbl[m.row]
 
         if r[m.col] != Piece._:
             raise IllegalMove(f"cell already occupied by piece ({m=})")
@@ -241,3 +243,64 @@ class Board:
             return (row, col)
 
         return self._parse_cell(token)
+
+    def _blank_cells(self) -> Generator[Cell]:
+        """Yield all unoccupied cells on the board"""
+        rows, cols = self.size
+        for row in range(rows):
+            for col in range(cols):
+                cell = (row, col)
+                p = self.cell_value(cell)
+                if p == Piece._:
+                    yield cell
+
+    def _playable_columns(self) -> Generator[int]:
+        """Yield all columns with at least one unoccupied cell"""
+        rows, cols = self.size
+
+        # Most efficient to scan column-wise, bottom up
+        for col in range(cols):
+            for row_one_indexed in range(rows, 1, -1):
+                row = row_one_indexed - 1  # Zero indexed
+                cell = (row, col)
+                p = self.cell_value(cell)
+                if p == Piece._:
+                    yield col
+
+    def playable_cells(self) -> Generator[Cell]:
+        """Yield all cells which are playable on the board given the specified
+        board's placement_rule.
+        """
+        pr = self.placement_rule
+        if pr == PlacementRule.ANYWHERE:
+            for cell in self._blank_cells():
+                yield cell
+        elif pr == PlacementRule.COLUMN_STACK:
+            for col in self._playable_columns():
+                row = self.top_empty_row_for_column(col)
+                cell = (row, col)
+                yield cell
+        else:
+            raise Exception('unknown placement rule')
+
+    def copy(self) -> 'Board':
+        from game.win_detector import WinDetector
+        b1 = self
+        b2 = Board()
+
+        b2.size = b1.size
+        b2.win_count = b1.win_count
+        b2.placement_rule = b1.placement_rule
+
+        b2.win_detector = WinDetector(b2)
+        b2._tbl = b1._tbl.copy()
+
+        return b2
+
+    @classmethod
+    def from_game_parameters(cls, params: GameParameters) -> 'Board':
+        return cls(
+            size=params.size,
+            win_count=params.win_count,
+            placement_rule=params.placement_rule
+        )

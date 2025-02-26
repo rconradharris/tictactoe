@@ -13,7 +13,6 @@ from at3.file_extensions import game_choice_from_extension
 from game.board import Board
 from game.game import Game
 from game.game_choice import GameChoice
-from game.move import Move
 from game.placement_rule import PlacementRule
 from game.player import Player
 from game.piece import Piece
@@ -215,11 +214,13 @@ class Parser:
 
                 self.state = ParseState.MOVE_CELL
             elif self.state == ParseState.MOVE_CELL:
+                assert self.game is not None
                 move = self.game.create_move(token)
 
                 # We apply moves so that if we're parsing a C4 game and the user
                 # supplies just a column letter, we know the empty row for a
                 # given column
+                assert self.game is not None
                 self.game.apply_move(move)
 
                 obj.moves.append(move)

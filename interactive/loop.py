@@ -9,7 +9,6 @@ from game.move import Move
 from game.piece import Piece
 from game.placement_rule import PlacementRule
 from game.player import Player
-from game.typedefs import Cell
 from interactive.command import Command
 from interactive.exceptions import ContinueLoop
 
@@ -78,7 +77,7 @@ def _input_move(g: Game) -> Move:
     return _parse_move(g, cell_str)
 
 
-def _pick_engine(g: Game, p: Player.P2) -> Engine:
+def _pick_engine(g: Game, p: Player) -> Engine:
     """
     We pick the engine based on PlacementRule rather GameChoice because we
     want the same engine to play grid sizes. So, for example, the even though
@@ -138,11 +137,7 @@ def start_loop() -> None:
 
     params = choice.parameters()
     if params:
-        b = Board(
-            size=params.size,
-            win_count=params.win_count,
-            placement_rule=params.placement_rule
-        )
+        b = Board.from_game_parameters(params)
 
     g = Game(b)
 

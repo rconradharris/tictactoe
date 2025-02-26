@@ -6,7 +6,20 @@ from tests.runner import run_test, run_tests
 
 def debug():
     """Place debug code here for one-off experiments"""
-    pass
+    from engine.minimax import GameTree, minimax
+    from game.board import Board
+    from game.game import Game
+    from game.game_choice import GameChoice
+    from game.piece import Piece
+
+    choice = GameChoice.TIC_TAC_TOE
+    params = choice.parameters()
+    b = Board.from_game_parameters(params)
+    g = Game(b)
+    g.choose_player1_piece(Piece.X)
+    t = GameTree.from_game(g, 2)
+
+    print(minimax(t.root, 1, True))
 
 
 def die(msg: str) -> None:
