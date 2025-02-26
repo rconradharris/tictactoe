@@ -6,9 +6,9 @@ from tests.runner import run_test, run_tests
 
 def debug():
     """Place debug code here for one-off experiments"""
-    from engine.minimax import GameTree, minimax
+    from engine.minimax import best_move, rand_eval
     from game.board import Board
-    from game.game import Game
+    from game.game import Game, GameState
     from game.game_choice import GameChoice
     from game.piece import Piece
 
@@ -17,9 +17,19 @@ def debug():
     b = Board.from_game_parameters(params)
     g = Game(b)
     g.choose_player1_piece(Piece.X)
-    t = GameTree.from_game(g, 2)
 
-    print(minimax(t.root, 1, True))
+    fn = rand_eval
+    num_plies = 2
+
+    print(g.board.pretty(coords=True))
+
+    while g.state != GameState.FINISHED:
+        m = best_move(g, num_plies, fn)
+        g.apply_move(m)
+
+        print(f"{g.state=} {g.result=}")
+        print(g.board.pretty(coords=True))
+        print()
 
 
 def die(msg: str) -> None:

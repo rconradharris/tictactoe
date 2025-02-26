@@ -166,4 +166,5 @@ class Game:
         g2.result = g1.result
         g2.move_history = g1.move_history.copy()
         g2.board = g1.board.copy()
+
         return g2

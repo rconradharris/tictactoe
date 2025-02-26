@@ -1,35 +1,68 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import List
 
 from game.game import Game
 from game.move import Move
+from game.player import Player
+
+
+type EvalFn = Callable[[Game, Move], float]
+
+
+def best_move(g: Game, num_plies: int, fn: EvalFn) -> Move:
+    """Return the current player's best move according to the evaluation
+    function
+    """
+    t = GameTree.from_game(g, num_plies)
+    maximizer = g.cur_player == Player.P1
+
+    minimax(t.root, 3, maximizer, fn)
+
+    n = t.root
+    scores = []
+    for idx, child in enumerate(n.children):
+        scores.append((child.score, idx))
+
+    if maximizer:
+        scores.sort(reverse=True)
+    else:
+        scores.sort()
+
+    best_score, best_idx = scores[0]
+    best_node = n.children[best_idx]
+    assert best_node.move is not None
+    return best_node.move
 
 
 @dataclass
 class Node:
     """A game tree node for use in a minimax algorithm"""
+    game: Game = field(repr=False)
     move: Move | None = None
+    score: float = 0.0
 
     children: List['Node'] = field(default_factory=list)
 
-    def heuristic(self) -> float:
-        """This is in 'piece' units; so 2.0 is like player 1 having an extra
-        piece. Likewise, -1.5 is like player 2 having the equivalent of an
-        extra piece an a half.
-
-        ~0.0 is considered draw-ish.
-        """
-        return 0.0
-
-    def terminal(self) -> bool:
-        return len(self.children) == 0
 
 
-def node_walk(cur_node: Node, g: Game, num_plies: int) -> None:
+
+def rand_eval(g: Game, m: Move) -> float:
+    """This is in 'piece' units; so 2.0 is like player 1 having an extra
+    piece. Likewise, -1.5 is like player 2 having the equivalent of an
+    extra piece an a half.
+
+    ~0.0 is considered draw-ish.
+    """
+    from random import uniform
+    return uniform(-1.0, 1.0)
+
+
+def _build_subtree(cur_node: Node, num_plies: int) -> None:
     if num_plies == 0:
         return
 
-    g = g.copy()  # Preserve the original game state
+    g = cur_node.game
 
     if cur_node.move:
         g.apply_move(cur_node.move)
@@ -38,11 +71,9 @@ def node_walk(cur_node: Node, g: Game, num_plies: int) -> None:
 
     for cell in g.board.playable_cells():
         m = Move(cell, p)
-        #print(f"{num_plies=} {m=}")
-        child = Node(m)
+        child = Node(g.copy(), m)
         cur_node.children.append(child)
-
-        node_walk(child, g, num_plies - 1)
+        _build_subtree(child, num_plies - 1)
 
 
 @dataclass
@@ -51,25 +82,31 @@ class GameTree:
 
     @classmethod
     def from_game(cls, g: Game, num_plies: int) -> 'GameTree':
-        root = Node()
+        root = Node(g.copy())
         t = GameTree(root)
-        node_walk(root, g, num_plies)
+        _build_subtree(root, num_plies)
         return t
 
 
-def minimax(node: Node, depth: int, maximizer: bool) -> float:
-    if depth == 0 or node.terminal():
-        return node.heuristic()
+def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
+    # Leaf (or hit depth stop)
+    if depth == 0 or len(node.children) == 0:
+        assert node.move is not None
+        score = fn(node.game, node.move)
+        node.score = score
+        return score
 
+    # Maximizer
     if maximizer:
         maxv = float('-inf')
         for child in node.children:
-            maxv = max(maxv, minimax(child, depth - 1, False))
+            maxv = max(maxv, minimax(child, depth - 1, False, fn))
+        node.score = maxv
         return maxv
 
     # Minimizer
     minv = float('inf')
     for child in node.children:
-        minv = min(minv, minimax(child, depth - 1, True))
-
+        minv = min(minv, minimax(child, depth - 1, True, fn))
+    node.score = minv
     return minv

@@ -1,3 +1,4 @@
+from copy import deepcopy
 import re
 import string
 from typing import Generator
@@ -293,7 +294,9 @@ class Board:
         b2.placement_rule = b1.placement_rule
 
         b2.win_detector = WinDetector(b2)
-        b2._tbl = b1._tbl.copy()
+        # Must be a deep copy so that the column lists aren't shared between
+        # copies
+        b2._tbl = deepcopy(b1._tbl)
 
         return b2
 
