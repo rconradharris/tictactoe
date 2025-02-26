@@ -1,8 +1,20 @@
-class EngineException(Exception):
+class GameException(Exception):
     pass
 
 
-class IllegalMove(EngineException):
+class IllegalMove(GameException):
+    pass
+
+
+class PieceSelectionException(GameException):
+    pass
+
+
+class PieceSelectionsAlreadyMade(PieceSelectionException):
+    pass
+
+
+class InvalidPieceSelection(PieceSelectionException):
     pass
 
 

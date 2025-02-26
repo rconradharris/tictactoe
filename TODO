@@ -23,6 +23,9 @@
 - Replace Cat Game with Draw since connect four is supported [DONE]
 - Add Board.reset(), call in Game.reset() [DONE]
 - Improve win scanning [DONE]
-- 3D tic-tac-toe
+- Add 'dummy' engine that plays random moves
 - Add at3.format()
+    - Write game parameters and moves
+    - User can add additional metdata by editing the file
 - Add interactive command to write at3 file
+- 3D tic-tac-toe

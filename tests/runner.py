@@ -29,6 +29,7 @@ def run_test(path: str) -> None:
               placement_rule=obj.placement_rule)
 
     g = Game(b)
+    g.choose_player1_piece(obj.player1_piece)
 
     t = TestContext(obj.event)
 

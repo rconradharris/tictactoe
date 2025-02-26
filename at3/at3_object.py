@@ -37,7 +37,7 @@ class AT3Object:
     game_choice: GameChoice = GameChoice.UNDEFINED
 
     # Required Fields
-    player1_choice: Piece = Piece._
+    player1_piece: Piece = Piece._
 
     # All Fields (known and unknown)
     #

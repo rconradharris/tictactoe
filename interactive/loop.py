@@ -46,10 +46,10 @@ def _handle_commands(b: Board, cmd_str: str) -> None:
         raise ContinueLoop
 
 
-def _parse_piece_placement(b: Board, cell_str: str) -> Cell:
+def _parse_move(g: Game, cell_str: str) -> Move:
     """Treat move as standard algebraic notation, e.g. 'a1'"""
     try:
-        return b.parse_piece_placement(cell_str)
+        return g.create_move(cell_str)
     except ValueError:
         # Try again
         print("error: invalid move syntax. (hint: 'a1')")
@@ -60,18 +60,18 @@ def _parse_piece_placement(b: Board, cell_str: str) -> Cell:
         raise ContinueLoop
 
 
-def _input_move(b: Board, move_num: int, cur_piece: Piece) -> Cell:
+def _input_move(g: Game, move_num: int, cur_piece: Piece) -> Move:
 
-    if b.placement_rule == PlacementRule.COLUMN_STACK:
+    if g.board.placement_rule == PlacementRule.COLUMN_STACK:
         hint = "type a column letter"
     else:
         hint = "type a coordinate like 'a1'"
 
-    cell_str = input(f"{move_num}. {cur_piece.pretty()} to Move (hint: {hint}): ")
+    cell_str = input(f"{move_num}. {g.cur_piece.pretty()} to Move (hint: {hint}): ")
 
-    _handle_commands(b, cell_str)
+    _handle_commands(g.board, cell_str)
 
-    return _parse_piece_placement(b, cell_str)
+    return _parse_move(g, cell_str)
 
 
 def _game_loop(g: Game) -> None:
@@ -87,6 +87,8 @@ def _game_loop(g: Game) -> None:
         else:
             break
 
+    g.choose_player1_piece(cur_piece)
+
     _show_board(g.board)
 
     move_num = 1
@@ -95,11 +97,9 @@ def _game_loop(g: Game) -> None:
             break
 
         try:
-            cell = _input_move(g.board, move_num, cur_piece)
+            move = _input_move(g, move_num, cur_piece)
         except ContinueLoop:
             continue
-
-        move = Move(cell, cur_piece)
 
         try:
             g.apply_move(move)

@@ -98,7 +98,7 @@ def _parse_player1_choice(obj: AT3Object, value: str) -> None:
     piece_str = value.upper()
 
     piece = Piece.from_str(piece_str)
-    obj.player1_choice = piece
+    obj.player1_piece = piece
 
 
 def _parse_placement_rule(obj: AT3Object, value: str) -> None:
@@ -150,7 +150,6 @@ class Parser:
 
     def __init__(self) -> None:
         self.state: ParseState = ParseState.INIT
-        self.cur_piece: Piece = Piece._
         self.prev_move_num: int = 0
         self.game: Game | None = None  # Remains `None` until metadata parsing is done
 
@@ -216,9 +215,7 @@ class Parser:
 
                 self.state = ParseState.MOVE_CELL
             elif self.state == ParseState.MOVE_CELL:
-                cell = self.game.board.parse_piece_placement(token)
-
-                move = Move(cell, self.cur_piece)
+                move = self.game.create_move(token)
 
                 # We apply moves so that if we're parsing a C4 game and the user
                 # supplies just a column letter, we know the empty row for a
@@ -227,12 +224,10 @@ class Parser:
 
                 obj.moves.append(move)
 
-                self.cur_piece = self.cur_piece.next()
-
                 self.state = ParseState.MOVE_NUMBER
 
     def _check_player_choice_specified(self, obj: AT3Object) -> None:
-        if obj.player1_choice == Piece._:
+        if obj.player1_piece == Piece._:
             raise RequiredFieldMissing("Player1Choice must be specified")
 
     def _check_required_fields(self, obj: AT3Object) -> None:
@@ -250,6 +245,7 @@ class Parser:
         # it
         b = Board(size=obj.size, win_count=obj.win_count, placement_rule=obj.placement_rule)
         self.game = Game(b)
+        self.game.choose_player1_piece(obj.player1_piece)
 
     def parse(self, at3_data: str, path: str | None = None) -> AT3Object:
         if self.state != ParseState.INIT:
@@ -282,9 +278,6 @@ class Parser:
                 self.state = ParseState.MOVE_NUMBER
 
             if self.state == ParseState.MOVE_NUMBER:
-                if self.cur_piece == Piece._:
-                    self.cur_piece = obj.player1_choice
-
                 self._parse_move_line(obj, line)
 
         self.state = ParseState.DONE

@@ -1,15 +1,17 @@
 from enum import Enum, auto
 
 from game.board import Board
-from game.exceptions import IllegalMove
+from game.exceptions import IllegalMove, PieceSelectionsAlreadyMade
 from game.move import Move
 from game.player import Player
 from game.piece import Piece
 from game.result import Result
+from game.typedefs import Cell
 
 
 class GameState(Enum):
     INIT = auto() 
+    PIECES_CHOSEN = auto()
     PLAYING = auto() 
     FINISHED = auto()
 
@@ -25,11 +27,17 @@ class Game:
 
     def reset(self) -> None:
         self.cur_player: Player = Player.P1
-        self.piece_selections: dict[Piece, Player] = {}
+        self._player2piece: dict[Player, Piece] = {}
+        self._piece2player: dict[Piece, Player] = {}
         self.state: GameState = GameState.INIT
         self.result: Result = Result.UNFINISHED
         self.move_history: list[Move] = []
         self.board.reset()
+
+    @property
+    def cur_piece(self) -> Piece:
+        """Return Piece associated with the current player on-move"""
+        return self._player2piece[self.cur_player]
 
     def _end_turn(self) -> None:
         if self.cur_player == Player.P1:
@@ -39,26 +47,20 @@ class Game:
 
     def _check_piece_consistency(self, m: Move) -> None:
         """Ensure players cannot switch pieces once they've chosen"""
-        cur_piece = m.piece
-
-        if cur_piece == Piece._:
+        p = m.piece
+        if p == Piece._:
             raise IllegalMove(f"piece cannot be blank ({m=})")
-
-        prev_player = self.piece_selections.get(cur_piece, None)
-
-        if prev_player is not None and prev_player != self.cur_player:
+        elif p != self.cur_piece:
             raise IllegalMove(f"player cannot switch pieces ({m=})")
 
-    def _choose_piece_for_cur_player(self, m: Piece) -> None:
-        """Declare a piece choice for the current player"""
-        self.piece_selections[m] = self.cur_player 
-
     def _check_game_state_pre_move(self, m: Move) -> None:
-        if self.state == GameState.FINISHED:
+        if self.state == GameState.INIT:
+            raise IllegalMove(f"cannot move until pieces chosen ({m=})")
+        elif self.state == GameState.FINISHED:
             raise IllegalMove(f"cannot move after a game has finished ({m=})")
 
     def _start_game_if_needed(self) -> None:
-        if self.state == GameState.INIT:
+        if self.state == GameState.PIECES_CHOSEN:
             self.state = GameState.PLAYING
 
     def _finish_game(self, r: Result) -> None:
@@ -76,13 +78,42 @@ class Game:
         elif self.board.full():
             self._finish_game(Result.DRAW)
 
+    def _map_player_to_piece(self, player: Player, piece: Piece) -> None:
+        self._player2piece[player] = piece
+        self._piece2player[piece] = player
+
+    def choose_player1_piece(self, p: Piece) -> None:
+        """Declare player1's piece selection.
+
+        This makes it so that the piece no longer needs to be passed in
+        explicitly: the game can infer the current piece based on whose turn
+        it is.
+        """
+        if self.state != GameState.INIT:
+            raise PieceSelectionException("game state must be INIT")
+
+        if self._player2piece or self._piece2player:
+            raise PieceSelectionsAlreadyMade
+
+        if p == Piece._:
+            raise InvalidPieceSelection
+        elif p == Piece.X:
+            self._map_player_to_piece(Player.P1, Piece.X)
+            self._map_player_to_piece(Player.P2, Piece.O)
+        elif p == Piece.O:
+            self._map_player_to_piece(Player.P1, Piece.O)
+            self._map_player_to_piece(Player.P2, Piece.X)
+        else:
+            raise InvalidPieceSelection
+
+        self.state = GameState.PIECES_CHOSEN
+
     def apply_move(self, m: Move) -> None:
         self._check_game_state_pre_move(m)
 
         self._start_game_if_needed()
         
         self._check_piece_consistency(m)
-        self._choose_piece_for_cur_player(m.piece)
 
         self.board.apply_move(m)
 
@@ -92,3 +123,14 @@ class Game:
 
         if self.state == GameState.PLAYING:
             self._end_turn()
+
+    def create_move(self, placement_location: str) -> Move:
+        """Place the current players piece at the location described by
+        the location.
+
+        In Tic-Tac-Toe, location should be a cell coordinate.
+
+        In Connect Four, the location can just be a column letter.
+        """
+        cell = self.board.parse_piece_placement(placement_location)
+        return Move(cell, self.cur_piece)
