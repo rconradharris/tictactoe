@@ -1,8 +1,6 @@
-from collections import Counter
 import sys
 
-from game.game_choice import GameChoice
-from game.result import Result
+from battle.battle import do_battle
 from interactive.loop import start_loop
 from tests.file_tests import run_file_test
 from tests.runner import run_tests
@@ -11,63 +9,6 @@ from tests.runner import run_tests
 def debug():
     """Place debug code here for one-off experiments"""
     pass
-
-
-def battle(choice: GameChoice = GameChoice.TIC_TAC_TOE,
-           num_games: int = 1000,
-           verbose: bool = False):
-    """Have two engines play each other"""
-    from engine.minimax import RandiMaxer
-    from game.board import Board
-    from engine.engine import Engine
-    from game.game import Game, GameState
-    from game.game_choice import GameChoice
-    from game.piece import Piece
-    from game.player import Player
-
-    params = choice.parameters()
-    assert params is not None
-    b = Board.from_game_parameters(params)
-    g = Game(b)
-
-    p2eng: dict[Player, Engine] = {}
-    p2eng[Player.P1] = RandiMaxer(g, Player.P1)
-    p2eng[Player.P2] = RandiMaxer(g, Player.P2)
-
-    result_stats: Counter = Counter()
-
-    for i in range(num_games):
-        game_num = i + 1
-        g.reset()
-        g.choose_player1_piece(Piece.X)
-
-        # Play until each game is done
-        while g.state != GameState.FINISHED:
-            eng = p2eng[g.cur_player]
-            m = eng.generate_move()
-
-            g.apply_move(m)
-
-            if verbose:
-                print(f"{g.state=} {g.result=}")
-                print(g.board.pretty(coords=True))
-                print()
-
-        print(f"Game {game_num}/{num_games} result: {g.result}")
-        result_stats[g.result] += 1
-
-    print("=== Stats ===")
-    print_result_stat(result_stats, Result.PLAYER1_VICTORY, num_games)
-    print_result_stat(result_stats, Result.PLAYER2_VICTORY, num_games)
-    print_result_stat(result_stats, Result.DRAW, num_games)
-
-
-def print_result_stat(result_stats: Counter, r: Result, total: int) -> None:
-    count = result_stats[r]
-    rate = count / total
-    pct = rate * 100
-
-    print(f"{r}: {pct:.1f}")
 
 
 def die(msg: str) -> None:
@@ -85,7 +26,7 @@ def main():
     elif cmd == "debug":
         debug()
     elif cmd == "battle":
-        battle()
+        do_battle()
     elif cmd == "file_test":
         # Single file test
         try:

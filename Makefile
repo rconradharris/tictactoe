@@ -6,6 +6,7 @@ play:
 debug:
 	uv run main.py debug
 
+.PHONY: battle
 battle:
 	uv run main.py battle
 
