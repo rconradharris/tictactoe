@@ -20,9 +20,9 @@ The different modules breakdown as:
 Things to Try
 =============
 
-- `make play` to play interactively
-- `make battle n=5` to watch two engines battle it out 5 times
-- `make tests` to run the unit and file-based test suites
+- `uv run play` to play interactively
+- `uv run battle n=5` to watch two engines battle it out 5 times
+- `uv run tests` to run the unit and file-based test suites
 
 
 Q & A

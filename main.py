@@ -1,20 +1,9 @@
+import argparse
 import logging
-import sys
 
-from battle.battle import do_battle
-from interactive.loop import start_loop
-from tests.file_tests import run_file_test
-from tests.runner import run_tests
-
-
-def debug():
-    """Place debug code here for one-off experiments"""
-    pass
-
-
-def die(msg: str) -> None:
-    print(msg, file=sys.stderr)
-    sys.exit(1)
+import battle.cli
+import interactive.cli
+import tests.cli
 
 
 def setup_logging():
@@ -24,37 +13,17 @@ def setup_logging():
 def main():
     setup_logging()
 
-    if len(sys.argv) < 2:
-        die("usage: main.py <play|test|tests>")
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(required=True)
 
-    cmd = sys.argv[1]
-    if cmd == "play":
-        start_loop()
-    elif cmd == "debug":
-        debug()
-    elif cmd == "battle":
-        # Single file test
-        try:
-            num_games = int(sys.argv[2])
-        except IndexError:
-            num_games = 1
-        except ValueError:
-            die("error: number of games must be a number")
+    # Register subparsers for each command
+    battle.cli.add_subparser(subparsers)
+    interactive.cli.add_subparser(subparsers)
+    tests.cli.add_subparser(subparsers)
 
-        do_battle(num_games=num_games)
-    elif cmd == "file_test":
-        # Single file test
-        try:
-            filename = sys.argv[2]
-        except IndexError:
-            die("error: specify test filename")
-        run_file_test(filename)
-    elif cmd == "tests":
-        # Full test suite
-        run_tests()
-    else:
-        print(f"error: unknown command '{cmd}'", file=sys.stderr)
-        sys.exit(1)
+    # Dispatch to command handler
+    args = parser.parse_args()
+    args.func(args)
     
 
 if __name__ == "__main__":
