@@ -15,7 +15,7 @@ class T3Farseer(Engine):
     """
     DEFAULT_PLIES = 7
 
-    VICTORY_UNIT = 100.0
+    VICTORY_UNIT = 1.0
     DRAW_UNIT = 0.01
 
     def generate_move(self) -> Move:

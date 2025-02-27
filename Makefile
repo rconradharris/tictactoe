@@ -8,10 +8,10 @@ debug:
 
 .PHONY: battle
 battle:
-	uv run main.py battle
+	uv run main.py battle ${n}
 
 file_test:
-	uv run main.py file_test ${TEST}
+	uv run main.py file_test ${test}
 
 .PHONY: tests
 tests:

@@ -13,7 +13,7 @@ from game.result import Result
 
 def do_battle(
         choice: GameChoice = GameChoice.TIC_TAC_TOE,
-        num_games: int = 5,
+        num_games: int = 1,
         verbose: bool = True,
         ):
     """Have two engines play each other"""

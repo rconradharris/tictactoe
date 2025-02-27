@@ -26,7 +26,15 @@ def main():
     elif cmd == "debug":
         debug()
     elif cmd == "battle":
-        do_battle()
+        # Single file test
+        try:
+            num_games = int(sys.argv[2])
+        except IndexError:
+            num_games = 1
+        except ValueError:
+            die("error: number of games must be a number")
+
+        do_battle(num_games=num_games)
     elif cmd == "file_test":
         # Single file test
         try:
