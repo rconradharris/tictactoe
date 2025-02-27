@@ -1,8 +1,8 @@
 from engine.engine import Engine
+from engine.game_tree import is_maximizer
 from engine.minimax import MinimaxTree
 from game.game import Game, GameState
 from game.move import Move
-from game.player import Player
 from game.result import Result
 
 
@@ -10,8 +10,8 @@ class T3Farseer(Engine):
     """
     Farseer is slow but accurate.
 
-    It works by looking far ahead. This makes the search slow since the number
-    of search space grows exponentially with the number of plies.
+    It works by looking far ahead. This makes the search slow since the size
+    of the search space grows dramatically with the number of plies.
     """
     DEFAULT_PLIES = 7
 
@@ -54,13 +54,12 @@ class T3Farseer(Engine):
         else:
             raise Exception('unknown result')
 
-        #print(f"{depth}: {m} {st=} {r=} {pen=}")
-
-        # Reduce the value of a victory if its more plies away
+        # Reduce the value of a victory if it takes more moves to get there
         pen = cls.DEPTH_PENALTY * (depth - 1)
         score -= pen
 
-        if g.cur_player == Player.P2:
+        maximizer = is_maximizer(g.cur_player)
+        if not maximizer:
             # Player 2 is always the minimizer
             score = -score
 

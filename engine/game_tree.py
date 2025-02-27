@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 from collections.abc import Callable
 from typing import List, Optional, Tuple
@@ -7,7 +8,21 @@ from game.move import Move
 from game.player import Player
 
 
+logger = logging.getLogger(__name__)
+INFO = logger.info
+
+
 type EvalFn = Callable[[Game, Move, int], float]
+
+
+def is_maximizer(p: Player) -> bool:
+    """Player 1 is always the maximizer
+
+    +1.0 is an immediate player 1 victory
+    -1.0 is an immediate player 2 victory
+     0.0 is an immediate draw
+    """
+    return p == Player.P1
 
 
 @dataclass
@@ -25,13 +40,7 @@ class Node:
 
     @property
     def maximizer(self) -> bool:
-        """Player 1 is always the maximizer
-
-        +1.0 is a player 1 victory
-        -1.0 is a player 2 victory
-         0.0 is a draw
-        """
-        return self.game.cur_player == Player.P1
+        return is_maximizer(self.game.cur_player)
 
     def pretty(self) -> str:
         if self.move:
@@ -56,7 +65,7 @@ class GameTree:
         """Place the evaluation minimaxer code in here"""
         raise NotImplementedError
 
-    def best_move(self, verbose: bool = False) -> Tuple[Move, float]:
+    def best_move(self) -> Tuple[Move, float]:
         children = self.root.children
 
         scores = []
@@ -71,9 +80,8 @@ class GameTree:
         best_score, best_idx = scores[0]
         best_node = children[best_idx]
 
-        if verbose:
-            pretty_scores = [children[idx].pretty() for _, idx in scores]
-            print(f"best: {best_node.pretty()} {pretty_scores}")
+        pretty_scores = [children[idx].pretty() for _, idx in scores]
+        INFO(f"best: {best_node.pretty()} {pretty_scores}")
 
         assert best_node.move is not None
         assert best_node.score is not None

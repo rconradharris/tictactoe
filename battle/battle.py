@@ -62,5 +62,3 @@ def print_result_stat(result_stats: Counter, r: Result, total: int) -> None:
     pct = rate * 100
 
     print(f"{r}: {pct:.1f}")
-
-

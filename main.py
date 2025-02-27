@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from battle.battle import do_battle
@@ -16,7 +17,13 @@ def die(msg: str) -> None:
     sys.exit(1)
 
 
+def setup_logging():
+    logging.basicConfig(level=logging.INFO)
+
+
 def main():
+    setup_logging()
+
     if len(sys.argv) < 2:
         die("usage: main.py <play|test|tests>")
 
