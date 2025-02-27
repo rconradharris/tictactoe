@@ -29,9 +29,3 @@
     - User can add additional metdata by editing the file
 - Add interactive command to write at3 file
 - 3D tic-tac-toe
-- Minimax
-    - Look at board state
-    - Generate a game tree of n plies
-    - Run minimax on game tree
-    - Select best move based on minimax score
-    - Play move

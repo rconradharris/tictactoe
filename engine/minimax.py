@@ -1,4 +1,9 @@
+import logging
+
 from engine.game_tree import EvalFn, GameTree, Node
+
+
+logger = logging.getLogger(__name__)
 
 
 def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
@@ -17,7 +22,7 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
     if depth == 0 or len(node.children) == 0:
         assert node.move is not None
         score = fn(node.game, node.move, node.depth)
-        node.score = score
+        node.set_score(score)
         return score
 
     # Maximizer
@@ -25,14 +30,14 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
         maxv = float('-inf')
         for child in node.children:
             maxv = max(maxv, minimax(child, depth - 1, False, fn))
-        node.score = maxv
+        node.set_score(maxv)
         return maxv
 
     # Minimizer
     minv = float('inf')
     for child in node.children:
         minv = min(minv, minimax(child, depth - 1, True, fn))
-    node.score = minv
+    node.set_score(minv)
     return minv
 
 

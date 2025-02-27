@@ -28,6 +28,7 @@ def is_maximizer(p: Player) -> bool:
 @dataclass
 class Node:
     """A game tree node for use in a minimax algorithm"""
+    tree: 'GameTree' = field(repr=False)
     game: Game = field(repr=False)
     move: Move | None = None
     parent: Optional['Node'] = None
@@ -49,13 +50,29 @@ class Node:
             m = "ROOT"
         return f"{m} ({self.score:.3f})"
 
+    def add_child(self, child: 'Node') -> None:
+        self.children.append(child)
+        self.tree.size += 1
+
+    def set_score(self, score: float) -> None:
+        self.score = score
+        self.tree.scored += 1
+
 
 @dataclass
 class GameTree:
     root: Node
 
+    # Number of nodes in the tree
+    size: int = 0
+
+    # The number of nodes that have been scored (i.e. visited)
+    # Reducing max_plies reduces the number of nodes visited
+    scored: int = 0
+
     def __init__(self, g: Game) -> None:
-        self.root = Node(g.copy())
+        self.root = Node(self, g.copy())
+        self.size += 1
 
     def build(self, max_plies: int) -> None:
         """Build out the subtree underneath the root"""
@@ -115,10 +132,12 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
     for cell in g.board.playable_cells():
         m = Move(cell, p)
 
-        child = Node(game=g.copy(),
+        child = Node(tree=cur_node.tree,
+                     game=g.copy(),
                      move=m,
                      parent=cur_node,
                      depth=cur_node.depth + 1)
 
-        cur_node.children.append(child)
+        cur_node.add_child(child)
+
         _build_subtree(child, num_plies - 1)
