@@ -30,6 +30,15 @@ class Game:
         self.board: Board = board
         self.reset()
 
+    def winner(self) -> Player | None:
+        """Returns the winning player, if we have one"""
+        if self.result == Result.PLAYER1_VICTORY:
+            return Player.P1
+        elif self.result == Result.PLAYER2_VICTORY:
+            return Player.P2
+        else:
+            return None
+
     def reset(self) -> None:
         self.cur_player: Player = Player.P1
         self._player2piece: dict[Player, Piece] = {}

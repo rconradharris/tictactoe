@@ -14,6 +14,10 @@ class Piece(Enum):
     O = auto()  # noqa: E741 (typographically ambiguous with zero, but thats okay)
 
 
+    @classmethod
+    def selectable(cls) -> list['Piece']:
+        return [cls.X, cls.O]
+
     def _pretty_ascii_x_o(self) -> str:
         if self == self._:
             return "_"

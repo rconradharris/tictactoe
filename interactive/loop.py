@@ -1,8 +1,11 @@
+from random import choice
+
 from engine.engine import Engine
 from engine.mnk.dummy import Dummy
 from engine.mnk.winimaxer import Winimaxer
 from game.board import Board
 from game.exceptions import CellBoundsException, IllegalMove
+from game.first_move import FirstMove
 from game.game import Game, GameState
 from game.game_choice import GameChoice
 from game.move import Move
@@ -77,15 +80,40 @@ def _input_move(g: Game) -> Move:
     return _parse_move(g, cell_str)
 
 
-def _pick_engine(g: Game, p: Player, level: int) -> Engine:
-    if level == 1:
+def _pick_engine(g: Game, first_move: FirstMove, difficulty: int) -> Engine:
+    if first_move == FirstMove.HUMAN:
+        p = Player.P2
+    elif first_move == FirstMove.ENGINE:
+        p = Player.P1
+    elif  first_move == FirstMove.COIN_TOSS:
+        p = choice([Player.P1, Player.P2])
+    else:
+        raise Exception('unknown first move value')
+
+    if difficulty == 1:
         return Dummy(g, p)
 
-    max_plies = level - 1
+    max_plies = difficulty - 1
     return Winimaxer(g, p, max_plies=max_plies)
 
 
+def _print_result(g: Game, eng: Engine) -> None:
+    winner = g.winner()
+    if winner is None:
+        if g.board.placement_rule == PlacementRule.COLUMN_STACK:
+            # Connect Four like
+            print("Draw!")
+        else:
+            # Tic-tac-toe like
+            print("Cat game!")
+    elif winner == eng.player:
+        print("You lose!")
+    else:
+        print("You win!")
+
+
 def _game_loop(g: Game, eng: Engine) -> None:
+
     while True:
         if g.state == GameState.FINISHED:
             break
@@ -107,73 +135,34 @@ def _game_loop(g: Game, eng: Engine) -> None:
 
         _show_board(g.board)
 
-    print(g.result)
+    _print_result(g, eng)
 
 
-def _input_difficulty_level() -> int:
-    diff = 0
+def start_loop(
+        game_choice: GameChoice = GameChoice.TIC_TAC_TOE,
+        difficulty: int = 5,
+        p1_piece: Piece = Piece.X,
+        first_move: FirstMove = FirstMove.COIN_TOSS,
+        ) -> None:
 
-    while True:
-        s = input("Choose difficulty level [1-10]: ")
-        try:
-            diff = int(s)
-        except ValueError:
-            # Try again
-            print("error: difficulty must be between 1 and 10")
-            continue
-        else:
-            break
-
-    return diff
-
-
-def _input_player1_piece() -> Piece:
-    p = Piece._
-
-    while True:
-        s = input("Choose 'X' or 'O': ")
-        s = s.upper()
-        try:
-            p = Piece.from_str(s)
-        except ValueError as e:
-            # Try again
-            print(e)
-            continue
-        else:
-            break
-
-    assert p != Piece._
-    return p
-
-
-def start_loop() -> None:
-    while True:
-        choice_str = input('Tic-Tac-Toe or Connect Four (T3 or C4)? ')
-        try:
-            choice = GameChoice.from_abbrev(choice_str)
-        except ValueError as e:
-            # Try again
-            print(e)
-            continue
-        else:
-            break
-
+    """
+    :param game_choice: which game to play
+    :param difficulty: how strong the engine is, a proxy for algorithm and
+    max_plies
+    :param p1_piece: whether player 1 is 'X' or 'O'
+    :param first_move: whether the engine or human goes first, or coin toss
+    """
     b = Board()
 
-    params = choice.parameters()
+    params = game_choice.parameters()
     if params:
         b = Board.from_game_parameters(params)
 
     g = Game(b)
 
-    player1_piece = _input_player1_piece()
-    g.choose_player1_piece(player1_piece)
+    g.choose_player1_piece(p1_piece)
 
-    level = _input_difficulty_level()
-
-    # FIXME: right now the engine is always player 2, but this should be
-    # configurable
-    eng = _pick_engine(g, Player.P2, level)
+    eng = _pick_engine(g, first_move, difficulty)
 
     _show_board(g.board)
 
