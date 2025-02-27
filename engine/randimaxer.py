@@ -1,7 +1,7 @@
 from random import uniform
 
 from engine.engine import Engine
-from engine.minimax import best_node
+from engine.minimax import MinimaxTree
 from game.game import Game
 from game.move import Move
 
@@ -11,22 +11,26 @@ class Randimaxer(Engine):
     moves but is rather stupid in that it uses an evaluation function which
     assigns a random score to each move.
     """
+
     def generate_move(self) -> Move:
         """Produce the next move"""
-        fn = self._eval_rand
+        t = MinimaxTree(self.game)
 
-        n = best_node(self.game, self.max_plies, fn)
+        t.build(self.max_plies)
 
-        assert n.move is not None
+        t.evaluate(self.max_plies, _eval_rand)
 
-        return n.move
+        m, score = t.best_move()
 
-    @classmethod
-    def _eval_rand(cls, g: Game, m: Move, depth: int) -> float:
-        """This is in 'piece' units; so 2.0 is like player 1 having an extra
-        piece. Likewise, -1.5 is like player 2 having the equivalent of an
-        extra piece an a half.
+        assert m is not None
+        return m
 
-        ~0.0 is considered draw-ish.
-        """
-        return uniform(-1.0, 1.0)
+
+def _eval_rand(g: Game, m: Move, depth: int) -> float:
+    """This is in 'piece' units; so 2.0 is like player 1 having an extra
+    piece. Likewise, -1.5 is like player 2 having the equivalent of an
+    extra piece an a half.
+
+    ~0.0 is considered draw-ish.
+    """
+    return uniform(-1.0, 1.0)

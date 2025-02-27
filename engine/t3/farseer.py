@@ -1,5 +1,5 @@
 from engine.engine import Engine
-from engine.minimax import best_node
+from engine.minimax import MinimaxTree
 from game.game import Game, GameState
 from game.move import Move
 from game.player import Player
@@ -25,15 +25,17 @@ class T3Farseer(Engine):
 
     def generate_move(self) -> Move:
         """Produce the next move"""
+        t = MinimaxTree(self.game)
+
+        t.build(self.max_plies)
+
         fn = self._eval_optimal
+        t.evaluate(self.max_plies, fn)
 
-        n = best_node(self.game, self.max_plies, fn)
+        m, score = t.best_move()
 
-        #print(f"{self.game.cur_player=} {n.move} {n.score=}")
-        assert n.move is not None
-
-        return n.move
-
+        assert m is not None
+        return m
 
     @classmethod
     def _eval_optimal(cls, g: Game, m: Move, depth: int) -> float:
