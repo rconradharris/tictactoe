@@ -22,7 +22,7 @@ Things to Try
 
 - `uv run main.py play` to play interactively
 - `uv run main.py battle -n 5` to watch two engines battle it out 5 times, tic-tac-toe is the default game
-- `uv run main.py battle -g c4 -n 3 --p2-plies 3` to watch two engines play Connect Four 5 times, player 2 only looks ahead 3 moves (plies)
+- `uv run main.py battle -g c4 -n 5 --p2-plies 3` to watch two engines play Connect Four 5 times, player 2 only looks ahead 3 moves (plies)
 - `uv run main.py tests` to run the unit and file-based test suites
 
 
