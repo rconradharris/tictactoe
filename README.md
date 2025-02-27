@@ -13,7 +13,7 @@ The different modules breakdown as:
   strategies, including minimax
 - game: responsible for keeping track of game state, enforcing the rules and
   detecting wins or draws
-- interactive: a simple CLI interface for playing a game
+- play: a simple CLI interface for playing a game
 - tests: A test suite which uses AT3 to encode a set of test cases
 
 

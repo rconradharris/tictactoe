@@ -12,8 +12,8 @@ from game.move import Move
 from game.piece import Piece
 from game.placement_rule import PlacementRule
 from game.player import Player
-from interactive.command import Command
-from interactive.exceptions import ContinueLoop
+from play.command import Command
+from play.exceptions import ContinueLoop
 
 
 def _show_board(b: Board) -> None:

@@ -29,3 +29,7 @@
     - User can add additional metdata by editing the file
 - Add interactive command to write at3 file
 - 3D tic-tac-toe
+- better promising move heuristics
+- alpha-beta pruning
+- refutation tables
+- killer move?

@@ -1,7 +1,7 @@
 from game.first_move import FirstMove
 from game.game_choice import GameChoice
 from game.piece import Piece
-from interactive.loop import start_loop
+from play.loop import start_loop
 
 
 def _add_first_move(parser) -> None:
