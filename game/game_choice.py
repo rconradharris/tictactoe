@@ -13,6 +13,25 @@ class GameChoice(Enum):
     CONNECT_FOUR = auto()
 
     @classmethod
+    def selectable(cls) -> list['GameChoice']:
+        """These are game choices which a human can select.
+
+        Undefined is not something we want people explicitly choosing.
+        """
+        return [
+            cls.TIC_TAC_TOE,
+            cls.CONNECT_FOUR,
+        ]
+
+    def abbrev(self) -> str:
+        if self == GameChoice.TIC_TAC_TOE:
+            return "t3"
+        elif self == GameChoice.CONNECT_FOUR:
+            return "c4"
+
+        return "?"
+
+    @classmethod
     def from_str(cls, choice: str) -> 'GameChoice':
         s = choice.lower()
 
