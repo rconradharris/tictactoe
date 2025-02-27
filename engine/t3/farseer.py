@@ -15,8 +15,13 @@ class T3Farseer(Engine):
     """
     DEFAULT_PLIES = 7
 
+    # Score for a victory on the next move
     VICTORY_UNIT = 1.0
-    DRAW_UNIT = 0.01
+
+    DRAW_UNIT = 0.0
+
+    # How much each ply reduces the score, i.e. the sooner the win, the better
+    DEPTH_PENALTY = 0.01
 
     def generate_move(self) -> Move:
         """Produce the next move"""
@@ -32,24 +37,29 @@ class T3Farseer(Engine):
 
     @classmethod
     def _eval_optimal(cls, g: Game, m: Move, depth: int) -> float:
-        st = g.state
+        if g.state != GameState.FINISHED:
+            return cls.DRAW_UNIT
+
+        score = cls.DRAW_UNIT
+
         r = g.result
-        #print(f"{depth}: {m} {st=} {r=}")
+        if r == Result.PLAYER1_VICTORY:
+            score = cls.VICTORY_UNIT
+        elif r == Result.PLAYER2_VICTORY:
+            score = cls.VICTORY_UNIT
+        elif r == Result.DRAW:
+            score = cls.DRAW_UNIT
+        else:
+            raise Exception('unknown result')
 
-        if st == GameState.FINISHED:
-            if r == Result.PLAYER1_VICTORY:
-                return (1 / depth) * cls.VICTORY_UNIT
-            elif r == Result.PLAYER2_VICTORY:
-                return (1 / depth) * -cls.VICTORY_UNIT
-            elif r == Result.DRAW:
-                p = g.cur_player
-                if p == Player.P1:
-                    return (1 / depth) * cls.DRAW_UNIT
-                elif p == Player.P2:
-                    return (1 / depth) * -cls.DRAW_UNIT
-                else:
-                    raise Exception('unknown player')
-            else:
-                raise Exception('unknown result')
+        #print(f"{depth}: {m} {st=} {r=} {pen=}")
 
-        return 0.0
+        # Reduce the value of a victory if its more plies away
+        pen = cls.DEPTH_PENALTY * (depth - 1)
+        score -= pen
+
+        if g.cur_player == Player.P2:
+            # Player 2 is always the minimizer
+            score = -score
+
+        return score

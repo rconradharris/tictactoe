@@ -25,6 +25,7 @@ def do_battle(
 
     p2eng: dict[Player, Engine] = {}
     p2eng[Player.P1] = Randimaxer(g, Player.P1)
+    #p2eng[Player.P1] = T3Farseer(g, Player.P1)
     p2eng[Player.P2] = T3Farseer(g, Player.P2)
 
     result_stats: Counter = Counter()

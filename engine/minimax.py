@@ -17,7 +17,9 @@ class Node:
     move: Move | None = None
     parent: Optional['Node'] = None
     depth: int  = 0
-    score: float = 0.0
+    # Use None instead of 0.0 so we can easily detect if minimax didn't fill
+    # the node in with a score
+    score: float | None = None
 
     children: List['Node'] = field(default_factory=list, repr=True)
 
@@ -26,7 +28,7 @@ class Node:
             m = self.move.pretty()
         else:
             m = "ROOT"
-        return f"{m} ({self.score})"
+        return f"{m} ({self.score:.3f})"
 
 
 def _build_subtree(cur_node: Node, num_plies: int) -> None:
