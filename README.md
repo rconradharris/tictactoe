@@ -9,10 +9,21 @@ The different modules breakdown as:
 
 - at3: implements a file format for recording m,n,k games. Think of this like
   chess' PGN, but for tic-tac-toe and its variants
+- engine: implements various m,n,k playing engines using a variety of
+  strategies, including minimax
 - game: responsible for keeping track of game state, enforcing the rules and
   detecting wins or draws
 - interactive: a simple CLI interface for playing a game
 - tests: A test suite which uses AT3 to encode a set of test cases
+
+
+Things to Try
+=============
+
+- `make play` to play interactively
+- `make battle n=5` to watch two engines battle it out 5 times
+- `make tests` to run the unit and file-based test suites
+
 
 Q & A
 =====
