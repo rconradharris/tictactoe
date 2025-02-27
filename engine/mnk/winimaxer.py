@@ -6,12 +6,13 @@ from game.move import Move
 from game.result import Result
 
 
-class T3Farseer(Engine):
+class Winimaxer(Engine):
     """
-    Farseer is slow but accurate.
+    Winimaxer applies the naive minimax algorithm to search the game tree for
+    wins and draws.
 
-    It works by looking far ahead. This makes the search slow since the size
-    of the search space grows dramatically with the number of plies.
+    If the `max_plies` is large enough, the engine will play optimally but
+    extremely slowly.
     """
     DEFAULT_PLIES = 7
 

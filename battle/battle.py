@@ -1,9 +1,9 @@
 from collections import Counter
 
-from engine.randimaxer import Randimaxer
-from engine.t3.farseer import T3Farseer
-from game.board import Board
 from engine.engine import Engine
+from engine.mnk.dummy import Dummy
+from engine.mnk.winimaxer import Winimaxer
+from game.board import Board
 from game.game import Game, GameState
 from game.game_choice import GameChoice
 from game.piece import Piece
@@ -24,9 +24,9 @@ def do_battle(
     g = Game(b)
 
     p2eng: dict[Player, Engine] = {}
-    p2eng[Player.P1] = Randimaxer(g, Player.P1)
-    #p2eng[Player.P1] = T3Farseer(g, Player.P1)
-    p2eng[Player.P2] = T3Farseer(g, Player.P2)
+    p2eng[Player.P1] = Dummy(g, Player.P1)
+    #p2eng[Player.P1] = Winimaxer(g, Player.P1)
+    p2eng[Player.P2] = Winimaxer(g, Player.P2)
 
     result_stats: Counter = Counter()
 
