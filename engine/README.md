@@ -1,3 +1,5 @@
+# Engine
+
 Engines are computer opponents.
 
 They generate moves according to some algorithm and then return those moves to

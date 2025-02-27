@@ -1,5 +1,4 @@
-Tic-Tac-Toe
-===========
+# Tic-Tac-Toe
 
 This project is a playground for exploring [m,n,k
 games](https://en.wikipedia.org/wiki/M,n,k-game), including Tic-Tac-Toe and
@@ -17,8 +16,7 @@ The different modules breakdown as:
 - tests: A test suite which uses AT3 to encode a set of test cases
 
 
-Things to Try
-=============
+# Things to Try
 
 - `uv run main.py play` to play interactively
 - `uv run main.py battle -n 5` to watch two engines battle it out 5 times, tic-tac-toe is the default game
@@ -26,8 +24,7 @@ Things to Try
 - `uv run main.py tests` to run the unit and file-based test suites
 
 
-Q & A
-=====
+# Q & A
 
 Q. Isn't Tic-Tac-Toe solved and known to be a draw with perfect play? If so why
 build a Python library to implement it?

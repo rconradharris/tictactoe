@@ -41,7 +41,7 @@ class Winimaxer(Engine):
 
         t.build(self.max_plies)
 
-        fn = self._eval_optimal
+        fn = self._eval_end_state
         t.evaluate(self.max_plies, fn)
 
         m, score = t.best_move()
@@ -50,7 +50,7 @@ class Winimaxer(Engine):
         return m
 
     @classmethod
-    def _eval_optimal(cls, g: Game, m: Move, depth: int) -> float:
+    def _eval_end_state(cls, g: Game, m: Move, depth: int) -> float:
         if g.state != GameState.FINISHED:
             return cls.DRAW_UNIT
 
@@ -72,7 +72,6 @@ class Winimaxer(Engine):
 
         maximizer = is_maximizer(g.cur_player)
         if not maximizer:
-            # Player 2 is always the minimizer
             score = -score
 
         return score
