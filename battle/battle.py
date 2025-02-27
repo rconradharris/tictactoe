@@ -1,6 +1,7 @@
 from collections import Counter
 
 from engine.randimaxer import Randimaxer
+from engine.t3.farseer import T3Farseer
 from game.board import Board
 from engine.engine import Engine
 from game.game import Game, GameState
@@ -12,8 +13,8 @@ from game.result import Result
 
 def do_battle(
         choice: GameChoice = GameChoice.TIC_TAC_TOE,
-        num_games: int = 1000,
-        verbose: bool = False,
+        num_games: int = 5,
+        verbose: bool = True,
         ):
     """Have two engines play each other"""
 
@@ -24,7 +25,7 @@ def do_battle(
 
     p2eng: dict[Player, Engine] = {}
     p2eng[Player.P1] = Randimaxer(g, Player.P1)
-    p2eng[Player.P2] = Randimaxer(g, Player.P2)
+    p2eng[Player.P2] = T3Farseer(g, Player.P2)
 
     result_stats: Counter = Counter()
 

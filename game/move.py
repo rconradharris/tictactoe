@@ -1,3 +1,5 @@
+import string
+
 from game.exceptions import IllegalMove
 from game.piece import Piece
 from game.typedefs import Cell
@@ -24,7 +26,14 @@ class Move:
     def col(self) -> int:
         return self.cell[1]
 
+    @property
+    def col_letter(self) -> str:
+        return string.ascii_lowercase[self.col]
+
+    def pretty(self) -> str:
+        p_str = self.piece.pretty()
+        return f"{self.col_letter}{self.row+1}:{p_str}"
+
     def __repr__(self) -> str:
         """Provide a more concise repr than dataclass default"""
-        row, col = self.cell
-        return f"Move({row}, {col}, {self.piece.pretty()})"
+        return self.pretty()

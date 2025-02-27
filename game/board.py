@@ -186,6 +186,7 @@ class Board:
         col_letter = col_letter.lower()
         if len(col_letter) != 1:
             raise ValueError(f"column must be a single letter ({col_letter})")
+
         if col_letter not in string.ascii_lowercase:
             raise ValueError(
                 f"column must be specified as a letter ({col_letter})")

@@ -1,7 +1,7 @@
 from random import uniform
 
 from engine.engine import Engine
-from engine.minimax import best_move
+from engine.minimax import best_node
 from game.game import Game
 from game.move import Move
 
@@ -13,16 +13,20 @@ class Randimaxer(Engine):
     """
     def generate_move(self) -> Move:
         """Produce the next move"""
-        fn = eval_rand
-        m = best_move(self.game, self.max_plies, fn)
-        return m
+        fn = self._eval_rand
 
+        n = best_node(self.game, self.max_plies, fn)
 
-def eval_rand(g: Game, m: Move) -> float:
-    """This is in 'piece' units; so 2.0 is like player 1 having an extra
-    piece. Likewise, -1.5 is like player 2 having the equivalent of an
-    extra piece an a half.
+        assert n.move is not None
 
-    ~0.0 is considered draw-ish.
-    """
-    return uniform(-1.0, 1.0)
+        return n.move
+
+    @classmethod
+    def _eval_rand(cls, g: Game, m: Move, depth: int) -> float:
+        """This is in 'piece' units; so 2.0 is like player 1 having an extra
+        piece. Likewise, -1.5 is like player 2 having the equivalent of an
+        extra piece an a half.
+
+        ~0.0 is considered draw-ish.
+        """
+        return uniform(-1.0, 1.0)

@@ -1,38 +1,13 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
-from game.game import Game
+from game.game import Game, GameState
 from game.move import Move
 from game.player import Player
 
 
-type EvalFn = Callable[[Game, Move], float]
-
-
-def best_move(g: Game, max_plies: int, fn: EvalFn) -> Move:
-    """Return the current player's best move according to the evaluation
-    function
-    """
-    t = GameTree.from_game(g, max_plies)
-    maximizer = g.cur_player == Player.P1
-
-    minimax(t.root, 3, maximizer, fn)
-
-    n = t.root
-    scores = []
-    for idx, child in enumerate(n.children):
-        scores.append((child.score, idx))
-
-    if maximizer:
-        scores.sort(reverse=True)
-    else:
-        scores.sort()
-
-    best_score, best_idx = scores[0]
-    best_node = n.children[best_idx]
-    assert best_node.move is not None
-    return best_node.move
+type EvalFn = Callable[[Game, Move, int], float]
 
 
 @dataclass
@@ -40,11 +15,18 @@ class Node:
     """A game tree node for use in a minimax algorithm"""
     game: Game = field(repr=False)
     move: Move | None = None
+    parent: Optional['Node'] = None
+    depth: int  = 0
     score: float = 0.0
 
-    children: List['Node'] = field(default_factory=list)
+    children: List['Node'] = field(default_factory=list, repr=True)
 
-
+    def pretty(self) -> str:
+        if self.move:
+            m = self.move.pretty()
+        else:
+            m = "ROOT"
+        return f"{m} ({self.score})"
 
 
 def _build_subtree(cur_node: Node, num_plies: int) -> None:
@@ -54,13 +36,30 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
     g = cur_node.game
 
     if cur_node.move:
+        assert cur_node.move.piece == g.cur_piece
+
+    if cur_node.move and g.state != GameState.FINISHED:
         g.apply_move(cur_node.move)
+
+    if g.state == GameState.FINISHED:
+        return
 
     p = g.cur_piece
 
+    if cur_node.move:
+        cur_node_piece = cur_node.move.piece
+        assert p != cur_node.move.piece, \
+                f"{p=} should not equal {cur_node_piece=}"
+
+
     for cell in g.board.playable_cells():
         m = Move(cell, p)
-        child = Node(g.copy(), m)
+
+        child = Node(game=g.copy(),
+                     move=m,
+                     parent=cur_node,
+                     depth=cur_node.depth + 1)
+
         cur_node.children.append(child)
         _build_subtree(child, num_plies - 1)
 
@@ -81,7 +80,7 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
     # Leaf (or hit depth stop)
     if depth == 0 or len(node.children) == 0:
         assert node.move is not None
-        score = fn(node.game, node.move)
+        score = fn(node.game, node.move, node.depth)
         node.score = score
         return score
 
@@ -99,3 +98,43 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
         minv = min(minv, minimax(child, depth - 1, True, fn))
     node.score = minv
     return minv
+
+
+def best_node(g: Game, max_plies: int, fn: EvalFn,
+              verbose: bool = True) -> Node:
+    """Return the current player's best move according to the evaluation
+    function
+    """
+    t = GameTree.from_game(g, max_plies)
+    maximizer = g.cur_player == Player.P1
+
+    #if verbose:
+    #    print("= Before minimax =")
+    #    pprint(t)
+
+    minimax(t.root, max_plies, maximizer, fn)
+
+    #if verbose:
+    #    print("= After minimax =")
+    #    pprint(t)
+
+    n = t.root
+    scores = []
+    for idx, child in enumerate(n.children):
+        scores.append((child.score, idx))
+
+    if maximizer:
+        scores.sort(reverse=True)
+    else:
+        scores.sort()
+
+    best_score, best_idx = scores[0]
+    best_node = n.children[best_idx]
+
+    if verbose:
+        m = best_node.move
+        assert m is not None
+        pretty_scores = [n.children[idx].pretty() for _, idx in scores]
+        print(f"best: {best_node.pretty()} {pretty_scores}")
+
+    return best_node
