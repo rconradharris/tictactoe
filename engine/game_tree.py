@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass, field
 from collections.abc import Callable
-from typing import List
+from typing import Generator, List
 
 from game.game import Game, GameState
 from game.move import Move, NULL_MOVE
@@ -13,10 +13,21 @@ INFO = logger.info
 
 
 # This function evaluates the position after a given move
+#
+# fn(game, move, depth) -> score
 type EvalFn = Callable[[Game, Move, int], float]
 
 # This function applies minimax (or a variant) to the game tree
+#
+# fn(node, depth, maximizer, evalFn) -> score
 type MinimaxFn = Callable[[Node, int, bool, EvalFn], float]
+
+# A move generator is a function that given a Game produces Moves
+#
+# It's more efficient if the move generator emits promising moves first
+#
+# fn(game) -> Gen(Move, ...)
+type MoveGenFn = Callable[[Game], Generator[Move]]
 
 
 def is_maximizer(p: Player) -> bool:
@@ -70,9 +81,9 @@ class Node:
 class GameTree:
     root: Node
 
-    def build(self, max_plies: int) -> None:
+    def build(self, max_plies: int, fn: MoveGenFn) -> None:
         """Build out the subtree underneath the root"""
-        _build_subtree(self.root, max_plies)
+        _build_subtree(self.root, max_plies, fn)
 
     def evaluate(self, max_plies: int, eFn: EvalFn, mFn: MinimaxFn) -> float:
         """Evaluate the game tree using minimax"""
@@ -102,15 +113,21 @@ class GameTree:
         return best_node
 
     @classmethod
-    def generate(cls, g: Game, max_plies: int) -> 'GameTree':
+    def generate(cls, g: Game, max_plies: int, move_generator: MoveGenFn) -> "GameTree":
         """Convenient factory function for building out a GameTree"""
         root = Node(g.copy(), NULL_MOVE)
         t = GameTree(root)
-        t.build(max_plies)
+        t.build(max_plies, move_generator)
         return t
 
 
-def _build_subtree(cur_node: Node, num_plies: int) -> None:
+def _build_subtree(cur_node: Node, num_plies: int, move_generator: MoveGenFn) -> None:
+    """Recursively build out the tree
+
+    :param cur_node: the node we're currently visiting
+    :param num_plies: number of plies remaining in our depth stop
+    :param move_generator: A function to generate promising moves in a game
+    """
     if num_plies == 0:
         return
 
@@ -135,10 +152,8 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
         cur_node_piece = cur_node.move.piece
         assert p != cur_node.move.piece, f"{p=} should not equal {cur_node_piece=}"
 
-    for cell in g.board.playable_cells():
-        m = Move(cell, p)
-
+    for m in move_generator(g):
         child = Node(g.copy(), m)
         cur_node.add_child(child)
 
-        _build_subtree(child, num_plies - 1)
+        _build_subtree(child, num_plies - 1, move_generator)

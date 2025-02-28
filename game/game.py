@@ -39,6 +39,11 @@ class Game:
         else:
             return None
 
+    def generate_moves(self) -> Generator[Move]:
+        p = self.cur_piece
+        for cell in self.board.playable_cells():
+            yield Move(cell, p)
+
     def reset(self) -> None:
         self.cur_player: Player = Player.P1
         self._player2piece: dict[Player, Piece] = {}
@@ -177,3 +182,9 @@ class Game:
         g2.board = g1.board.copy()
 
         return g2
+
+
+def generate_moves(g: Game) -> Generator[Move]:
+    """Convenience function that conforms to MoveGenFn spec"""
+    for m in g.generate_moves():
+        yield m

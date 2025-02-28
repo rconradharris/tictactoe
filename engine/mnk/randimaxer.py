@@ -2,6 +2,7 @@ from engine.engine import Engine
 from engine.game_tree import GameTree
 from engine.minimax import minimax
 from engine.mnk.heuristics import eval_rand
+from game.game import generate_moves
 from game.move import Move
 
 
@@ -13,7 +14,8 @@ class Randimaxer(Engine):
 
     def generate_move(self) -> Move:
         """Produce the next move"""
-        t = GameTree.generate(self.game, self.max_plies)
+        gFn = generate_moves
+        t = GameTree.generate(self.game, self.max_plies, gFn)
 
         eFn = eval_rand
         mFn = minimax
