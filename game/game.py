@@ -15,14 +15,22 @@ from game.piece import Piece
 from game.result import Result
 
 
-type NotifyMoveFn = Callable[[Move], None]
-
-
 class GameState(Enum):
     INIT = auto()
     PIECES_CHOSEN = auto()
     PLAYING = auto()
     FINISHED = auto()
+
+
+class GameEvent(Enum):
+    """These are events that game engines can listen for to adjust their
+    internal state
+    """
+    MOVE = auto()
+    RESET = auto()
+
+
+type NotifyEventFn = Callable[[GameEvent], None]
 
 
 class Game:
@@ -32,7 +40,7 @@ class Game:
 
     def __init__(self, board: Board):
         self.board: Board = board
-        self._move_listeners: list[NotifyMoveFn] = []
+        self._event_listeners: list[NotifyEventFn] = []
         self.reset()
 
     def winner(self) -> Player | None:
@@ -57,6 +65,7 @@ class Game:
         self.result: Result = Result.UNFINISHED
         self.move_history: list[Move] = []
         self.board.reset()
+        self._notify_event(GameEvent.RESET)
 
     @property
     def move_num(self) -> int:
@@ -150,7 +159,7 @@ class Game:
 
         self._adjust_game_state_post_move()
 
-        self._notify_move_listeners(m)
+        self._notify_event(GameEvent.MOVE)
 
         if self.state == GameState.PLAYING:
             self._end_turn()
@@ -190,20 +199,20 @@ class Game:
 
         return g2
 
-    def add_move_listener(self, fn: NotifyMoveFn) -> None:
-        """Add a callback for when a move is made
+    def add_event_listener(self, fn: NotifyEventFn) -> None:
+        """Add a callback for when a game event occurs
 
         An Engine will use this to update its internal state when a move is
         officially recorded in the books.
         """
-        self._move_listeners.append(fn)
+        self._event_listeners.append(fn)
 
-    def remove_move_listener(self, fn: NotifyMoveFn) -> None:
-        self._move_listeners.remove(fn)
+    def remove_event_listener(self, fn: NotifyEventFn) -> None:
+        self._event_listeners.remove(fn)
 
-    def _notify_move_listeners(self, m: Move) -> None:
-        for fn in self._move_listeners:
-            fn(m)
+    def _notify_event(self, evt: GameEvent) -> None:
+        for fn in self._event_listeners:
+            fn(evt)
 
 
 def generate_moves(g: Game) -> Generator[Move]:

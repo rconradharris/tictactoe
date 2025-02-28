@@ -3,7 +3,7 @@ from collections import Counter
 from engine.engine import Engine, create_engine
 from engine.engine_choice import EngineChoice
 from game.board import Board
-from game.game import Game, GameState
+from game.game import Game, GameState, generate_moves
 from game.game_choice import GameChoice
 from game.piece import Piece
 from game.player import Player
@@ -34,16 +34,14 @@ def do_battle(
 
     eng_map: dict[Player, Engine] = {}
 
+    # Player 1 engine
     p1_eng_cls = p1_engine.engine()
-
     p1_eng = create_engine(p1_eng_cls, g, Player.P1, max_plies=p1_plies)
-
     eng_map[Player.P1] = p1_eng
 
+    # Player 2 engine
     p2_eng_cls = p2_engine.engine()
-
     p2_eng = create_engine(p2_eng_cls, g, Player.P2, max_plies=p2_plies)
-
     eng_map[Player.P2] = p2_eng
 
     result_stats: Counter = Counter()
@@ -52,6 +50,11 @@ def do_battle(
         game_num = i + 1
         g.reset()
         g.choose_player1_piece(Piece.X)
+
+        # Generate the game tree once a piece has been selected
+        gFn = generate_moves
+        p1_eng.generate_game_tree(gFn)
+        p2_eng.generate_game_tree(gFn)
 
         # Play until each game is done
         while g.state != GameState.FINISHED:

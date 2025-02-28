@@ -4,6 +4,9 @@
     - remove size and scored attributes from tree, hard to keep in sync if we mutate the tree [DONE]
     - add move applied listener so engine knows when a move was made and can update GameTree accordingly [DONE]
 
+    - generate game tree once
+    - when a move is applied, update game tree
+
     - battle5
         current: 0m48.041s
 - Add at3.format()

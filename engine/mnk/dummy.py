@@ -1,6 +1,8 @@
 from random import choice
 
 from engine.engine import Engine
+from engine.game_tree import MoveGenFn
+from game.game import generate_moves
 from game.move import Move
 
 
@@ -15,8 +17,10 @@ class Dummy(Engine):
     from the top-most empty cells across the board.
     """
 
+    def generate_game_tree(self, fn: MoveGenFn) -> None:
+        """The Dummy engine doesn't use a Game Tree"""
+        pass
+
     def generate_move(self) -> Move:
-        b = self.game.board
-        cells = list(b.playable_cells())
-        cell = choice(cells)
-        return Move(cell, self.game.cur_piece)
+        moves = list(generate_moves(self.game))
+        return choice(moves)

@@ -1,6 +1,5 @@
 from engine.alphabeta import alphabeta
 from engine.engine import Engine
-from engine.game_tree import GameTree
 from engine.mnk.heuristics import eval_end_state
 from game.game import generate_moves
 from game.move import Move
@@ -16,7 +15,9 @@ class Winibetamaxer(Engine):
     def propose_move(self) -> Move:
         """Produce the next move"""
         gFn = generate_moves
-        t = GameTree.generate(self.game, self.max_plies, gFn)
+        self.generate_game_tree(gFn)
+        t = self.tree
+        assert t is not None
 
         eFn = eval_end_state
         mFn = alphabeta
