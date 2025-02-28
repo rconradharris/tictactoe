@@ -1,9 +1,6 @@
 from engine.engine import Engine
-from engine.game_tree import GameTree
+from engine.game_tree import MinimaxFn
 from engine.minimax import minimax
-from engine.mnk.heuristics import eval_end_state
-from game.game import generate_moves
-from game.move import Move
 
 
 class Winimaxer(Engine):
@@ -26,17 +23,7 @@ class Winimaxer(Engine):
     (and very slowly).
     """
 
-    DEFAULT_PLIES = 7
+    DEFAULT_PLIES: int = 7
 
-    def propose_move(self) -> Move:
-        """Produce the next move"""
-        gFn = generate_moves
-        t = GameTree.generate(self.game, self.max_plies, gFn)
-
-        eFn = eval_end_state
-        mFn = minimax
-        t.evaluate(self.max_plies, eFn, mFn)
-
-        n = t.best_move()
-
-        return n.move
+    # Use naive minimax w/o alpha/beta pruning
+    MINIMAX_FN: MinimaxFn = minimax

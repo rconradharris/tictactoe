@@ -21,6 +21,6 @@ class Dummy(Engine):
         """The Dummy engine doesn't use a Game Tree"""
         pass
 
-    def generate_move(self) -> Move:
+    def propose_move(self) -> Move:
         moves = list(generate_moves(self.game))
         return choice(moves)
