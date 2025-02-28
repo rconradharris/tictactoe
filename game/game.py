@@ -15,9 +15,9 @@ from game.result import Result
 
 
 class GameState(Enum):
-    INIT = auto() 
+    INIT = auto()
     PIECES_CHOSEN = auto()
-    PLAYING = auto() 
+    PLAYING = auto()
     FINISHED = auto()
 
 
@@ -131,7 +131,7 @@ class Game:
         self._check_game_state_pre_move(m)
 
         self._start_game_if_needed()
-        
+
         self._check_piece_consistency(m)
 
         self.board.apply_move(m)
@@ -159,7 +159,7 @@ class Game:
         for cell in self.board.playable_cells():
             yield Move(cell, self.cur_piece)
 
-    def copy(self) -> 'Game':
+    def copy(self) -> "Game":
         """Make a full copy of a game"""
         g1 = self
 

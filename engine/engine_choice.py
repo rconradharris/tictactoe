@@ -2,6 +2,7 @@ from enum import Enum, auto
 
 from engine.engine import Engine
 
+
 class EngineChoice(Enum):
     DUMMY = auto()
     RANDIMAXER = auto()
@@ -11,31 +12,35 @@ class EngineChoice(Enum):
     def engine(self) -> type[Engine]:
         if self == EngineChoice.DUMMY:
             from engine.mnk.dummy import Dummy
+
             return Dummy
         elif self == EngineChoice.RANDIMAXER:
             from engine.mnk.randimaxer import Randimaxer
+
             return Randimaxer
         elif self == EngineChoice.WINIMAXER:
             from engine.mnk.winimaxer import Winimaxer
+
             return Winimaxer
         elif self == EngineChoice.WINIBETAMAXER:
             from engine.mnk.winibetamaxer import Winibetamaxer
+
             return Winibetamaxer
 
-        raise ValueError('unknown engine choice')
+        raise ValueError("unknown engine choice")
 
     def pretty(self) -> str:
         if self == EngineChoice.DUMMY:
-            return 'dummy'
+            return "dummy"
         elif self == EngineChoice.RANDIMAXER:
-            return 'randimaxer'
+            return "randimaxer"
         elif self == EngineChoice.WINIMAXER:
-            return 'winimaxer'
+            return "winimaxer"
         elif self == EngineChoice.WINIBETAMAXER:
-            return 'winibetamaxer'
+            return "winibetamaxer"
 
     @classmethod
-    def from_str(cls, s: str) -> 'EngineChoice':
+    def from_str(cls, s: str) -> "EngineChoice":
         if s == "dummy":
             return cls.DUMMY
         elif s == "randimaxer":
@@ -45,4 +50,4 @@ class EngineChoice(Enum):
         elif s == "winibetamaxer":
             return cls.WINIBETAMAXER
 
-        raise ValueError(f'unknown engine choice: {s}')
+        raise ValueError(f"unknown engine choice: {s}")

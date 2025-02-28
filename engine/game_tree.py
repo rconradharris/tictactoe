@@ -29,16 +29,17 @@ def is_maximizer(p: Player) -> bool:
 @dataclass
 class Node:
     """A game tree node for use in a minimax algorithm"""
-    tree: 'GameTree' = field(repr=False)
+
+    tree: "GameTree" = field(repr=False)
     game: Game = field(repr=False)
     move: Move | None = None
-    parent: Optional['Node'] = None
-    depth: int  = 0
+    parent: Optional["Node"] = None
+    depth: int = 0
     # Use None instead of 0.0 so we can easily detect if minimax didn't fill
     # the node in with a score
     score: float | None = None
 
-    children: List['Node'] = field(default_factory=list, repr=True)
+    children: List["Node"] = field(default_factory=list, repr=True)
 
     @property
     def maximizer(self) -> bool:
@@ -51,7 +52,7 @@ class Node:
             m = "ROOT"
         return f"{m} ({self.score:.3f})"
 
-    def add_child(self, child: 'Node') -> None:
+    def add_child(self, child: "Node") -> None:
         self.children.append(child)
         self.tree.size += 1
 
@@ -79,10 +80,7 @@ class GameTree:
         """Build out the subtree underneath the root"""
         _build_subtree(self.root, max_plies)
 
-    def evaluate(self,
-                 max_plies: int,
-                 eFn: EvalFn,
-                 mFn: MinimaxFn) -> float:
+    def evaluate(self, max_plies: int, eFn: EvalFn, mFn: MinimaxFn) -> float:
         """Place the evaluation minimaxer code in here"""
         r = self.root
         return mFn(r, max_plies, r.maximizer, eFn)
@@ -130,18 +128,18 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
 
     if cur_node.move:
         cur_node_piece = cur_node.move.piece
-        assert p != cur_node.move.piece, \
-                f"{p=} should not equal {cur_node_piece=}"
-
+        assert p != cur_node.move.piece, f"{p=} should not equal {cur_node_piece=}"
 
     for cell in g.board.playable_cells():
         m = Move(cell, p)
 
-        child = Node(tree=cur_node.tree,
-                     game=g.copy(),
-                     move=m,
-                     parent=cur_node,
-                     depth=cur_node.depth + 1)
+        child = Node(
+            tree=cur_node.tree,
+            game=g.copy(),
+            move=m,
+            parent=cur_node,
+            depth=cur_node.depth + 1,
+        )
 
         cur_node.add_child(child)
 

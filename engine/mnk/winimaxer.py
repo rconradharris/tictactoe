@@ -24,6 +24,7 @@ class Winimaxer(Engine):
     horizon is the entire game tree, Winimax is guaranteed to play optimally
     (and very slowly).
     """
+
     DEFAULT_PLIES = 7
 
     def generate_move(self) -> Move:

@@ -8,12 +8,13 @@ class GameChoice(Enum):
     """Acts as a fixed menu for certain game parameters so you don't have to
     fill in Grid, WinCount and PlacementRule explicitly.
     """
+
     UNDEFINED = auto()
     TIC_TAC_TOE = auto()
     CONNECT_FOUR = auto()
 
     @classmethod
-    def selectable(cls) -> list['GameChoice']:
+    def selectable(cls) -> list["GameChoice"]:
         """These are game choices which a human can select.
 
         Undefined is not something we want people explicitly choosing.
@@ -32,7 +33,7 @@ class GameChoice(Enum):
         return "?"
 
     @classmethod
-    def from_str(cls, choice: str) -> 'GameChoice':
+    def from_str(cls, choice: str) -> "GameChoice":
         s = choice.lower()
 
         if s == "undefined":
@@ -45,7 +46,7 @@ class GameChoice(Enum):
         raise ValueError(f"unknown game choice: '{choice}'")
 
     @classmethod
-    def from_abbrev(cls, abbrev: str) -> 'GameChoice':
+    def from_abbrev(cls, abbrev: str) -> "GameChoice":
         s = abbrev.lower()
 
         if s == "undefined":
@@ -64,15 +65,11 @@ class GameChoice(Enum):
         """
         if self == GameChoice.TIC_TAC_TOE:
             return GameParameters(
-                size = (3, 3),
-                win_count=3,
-                placement_rule=PlacementRule.ANYWHERE
+                size=(3, 3), win_count=3, placement_rule=PlacementRule.ANYWHERE
             )
         elif self == GameChoice.CONNECT_FOUR:
             return GameParameters(
-                size = (6, 7),
-                win_count=4,
-                placement_rule=PlacementRule.COLUMN_STACK
+                size=(6, 7), win_count=4, placement_rule=PlacementRule.COLUMN_STACK
             )
 
         return None

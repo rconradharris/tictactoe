@@ -11,7 +11,8 @@ from game.placement_rule import PlacementRule
 from game.piece import Piece
 from game.typedefs import BoardSize, Cell
 
-RE_MOVE_CELL = re.compile(r'([a-zA-Z])(\d)')
+RE_MOVE_CELL = re.compile(r"([a-zA-Z])(\d)")
+
 
 class Board:
     """
@@ -27,10 +28,12 @@ class Board:
     exception will be generated to ensure the integrity of the game.
     """
 
-    def __init__(self,
-                 size: BoardSize = (3, 3),
-                 win_count: int = 3,
-                 placement_rule: PlacementRule = PlacementRule.ANYWHERE) -> None:
+    def __init__(
+        self,
+        size: BoardSize = (3, 3),
+        win_count: int = 3,
+        placement_rule: PlacementRule = PlacementRule.ANYWHERE,
+    ) -> None:
         """
         :param size: (rows, cols) of board
         :param win: number in a row it takes to win
@@ -97,7 +100,7 @@ class Board:
         blank_vert = " " * len(vert_break)
 
         cell_width = 3
-       
+
         horiz_line_width = cell_width * cols
         horiz_line_width += len(vert_break) * (cols - 1)
         horiz_line = horiz_blank + ("-" * horiz_line_width)
@@ -106,8 +109,7 @@ class Board:
 
         if coords:
             low = string.ascii_lowercase
-            row_heading = [
-                low[i].center(cell_width) for i in range(cols)]
+            row_heading = [low[i].center(cell_width) for i in range(cols)]
             row_heading_str = horiz_blank + blank_vert.join(row_heading)
 
             pretty_tbl.append(row_heading_str)
@@ -188,13 +190,12 @@ class Board:
             raise ValueError(f"column must be a single letter ({col_letter})")
 
         if col_letter not in string.ascii_lowercase:
-            raise ValueError(
-                f"column must be specified as a letter ({col_letter})")
+            raise ValueError(f"column must be specified as a letter ({col_letter})")
 
-        col = ord(col_letter) - ord('a')
+        col = ord(col_letter) - ord("a")
 
         _, cols = self.size
-        on_board = (0 <= col < cols)
+        on_board = 0 <= col < cols
         if not on_board:
             raise CellBoundsException(f"cell out of bounds {col_letter=}")
 
@@ -279,10 +280,11 @@ class Board:
                 cell = (row, col)
                 yield cell
         else:
-            raise Exception('unknown placement rule')
+            raise Exception("unknown placement rule")
 
-    def copy(self) -> 'Board':
+    def copy(self) -> "Board":
         from game.win_detector import WinDetector
+
         b1 = self
         b2 = Board()
 
@@ -298,9 +300,9 @@ class Board:
         return b2
 
     @classmethod
-    def from_game_parameters(cls, params: GameParameters) -> 'Board':
+    def from_game_parameters(cls, params: GameParameters) -> "Board":
         return cls(
             size=params.size,
             win_count=params.win_count,
-            placement_rule=params.placement_rule
+            placement_rule=params.placement_rule,
         )

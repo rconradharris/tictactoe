@@ -27,14 +27,14 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
 
     # Maximizer
     if maximizer:
-        maxv = float('-inf')
+        maxv = float("-inf")
         for child in node.children:
             maxv = max(maxv, minimax(child, depth - 1, False, fn))
         node.set_score(maxv)
         return maxv
 
     # Minimizer
-    minv = float('inf')
+    minv = float("inf")
     for child in node.children:
         minv = min(minv, minimax(child, depth - 1, True, fn))
     node.set_score(minv)

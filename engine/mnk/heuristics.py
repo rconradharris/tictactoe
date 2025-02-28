@@ -28,7 +28,7 @@ def eval_end_state(g: Game, m: Move, depth: int) -> float:
     elif r == Result.DRAW:
         score = DRAW_UNIT
     else:
-        raise Exception('unknown result')
+        raise Exception("unknown result")
 
     # Reduce the value of a victory if it takes more moves to get there
     pen = DEPTH_PENALTY * (depth - 1)

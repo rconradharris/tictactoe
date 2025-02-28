@@ -24,9 +24,7 @@ def run_file_test(path: str) -> None:
         print(f"{path}: test failure")
         raise e
 
-    b = Board(size=obj.size,
-              win_count=obj.win_count,
-              placement_rule=obj.placement_rule)
+    b = Board(size=obj.size, win_count=obj.win_count, placement_rule=obj.placement_rule)
 
     g = Game(b)
     g.choose_player1_piece(obj.player1_piece)
@@ -61,5 +59,3 @@ def run_file_tests(root: str) -> None:
     for path in test_files:
         if valid_file_extension(path):
             run_file_test(path)
-
-

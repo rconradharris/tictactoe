@@ -1,6 +1,7 @@
 """
 Utilities for working in higher dimensions
 """
+
 from typing import List
 
 

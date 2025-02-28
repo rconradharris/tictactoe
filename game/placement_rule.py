@@ -21,7 +21,7 @@ class PlacementRule(Enum):
     COLUMN_STACK = auto()
 
     @classmethod
-    def from_str(cls, s: str) -> 'PlacementRule':
+    def from_str(cls, s: str) -> "PlacementRule":
         x = s.lower()
         if x == "anywhere":
             return cls.ANYWHERE

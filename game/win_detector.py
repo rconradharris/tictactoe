@@ -56,6 +56,7 @@ class WinDetector:
     dimensionality of the board. For a 2D board, we scan horizontal, vertical,
     forward slash diagonally and backslash diagonally.
     """
+
     def __init__(self, b: Board) -> None:
         self.board = b
         self.seq_detector = PieceSequenceDetector(b)
@@ -128,7 +129,6 @@ class WinDetector:
                 if self.seq_detector.put(piece):
                     return True
 
-
         # Scan - right
         last_row_idx = sz[0] - 1
         for r1, c1 in _directional_scan((last_row_idx, 1), Direction.W_E, sz):
@@ -159,7 +159,6 @@ class WinDetector:
                 if self.seq_detector.put(piece):
                     return True
 
-
         # Scan - right on first row, start at col 1 since we already did col 0
         # in the previous pass
         for r1, c1 in _directional_scan((0, 1), Direction.W_E, sz):
@@ -175,8 +174,8 @@ class WinDetector:
 
 
 class PieceSequenceDetector:
-    """Class for detecting if a sequence of k pieces are seen in a row
-    """
+    """Class for detecting if a sequence of k pieces are seen in a row"""
+
     def __init__(self, board: Board) -> None:
         self.board = board
         self.reset()
@@ -186,8 +185,7 @@ class PieceSequenceDetector:
         self.run_count: int = 0
 
     def put(self, piece: Piece) -> bool:
-        """Returns True if the latest piece caused a win, otherwise False
-        """
+        """Returns True if the latest piece caused a win, otherwise False"""
         if piece == Piece._:
             self.run_count = 0
         elif self.prev_piece is None:
@@ -204,9 +202,7 @@ class PieceSequenceDetector:
         return False
 
 
-def _directional_scan(origin: Cell,
-                      dir_: Direction,
-                      sz: BoardSize) -> Generator[Cell]:
+def _directional_scan(origin: Cell, dir_: Direction, sz: BoardSize) -> Generator[Cell]:
     """Scan cells starting at origin in the given direction until board
     boundary is hit
     """

@@ -7,11 +7,11 @@ from play.loop import start_loop
 def _add_first_move(parser) -> None:
     choices = [x.pretty() for x in FirstMove.all()]
     parser.add_argument(
-        '--first-move',
-        '-f',
+        "--first-move",
+        "-f",
         default=FirstMove.COIN_TOSS.pretty(),
         choices=choices,
-        help='who plays first, default is to use a coin toss',
+        help="who plays first, default is to use a coin toss",
     )
 
 
@@ -25,21 +25,21 @@ def _add_p1_piece(parser) -> None:
         choices.append(s.lower())
 
     parser.add_argument(
-        '--p1-piece',
+        "--p1-piece",
         default=Piece.X.pretty(),
         choices=choices,
-        help='which piece player 1 should use',
+        help="which piece player 1 should use",
     )
 
 
 def _add_game_choice(parser) -> None:
     choices = [x.abbrev() for x in GameChoice.selectable()]
     parser.add_argument(
-        '--game',
-        '-g',
+        "--game",
+        "-g",
         default=GameChoice.TIC_TAC_TOE.abbrev(),
         choices=choices,
-        help='which game to play, tic-tac-toe or connect four',
+        help="which game to play, tic-tac-toe or connect four",
     )
 
 
@@ -58,20 +58,20 @@ def _play(args) -> None:
 
 def add_subparser(subparsers) -> None:
     p = subparsers.add_parser(
-        'play',
-        aliases=['p'],
-        help='play interactively',
+        "play",
+        aliases=["p"],
+        help="play interactively",
     )
     p.set_defaults(func=_play)
 
     _add_game_choice(p)
 
     p.add_argument(
-        '--difficulty',
-        '-d',
+        "--difficulty",
+        "-d",
         type=int,
         default=5,
-        help='how difficult the computer opponent is, lower is easier',
+        help="how difficult the computer opponent is, lower is easier",
     )
 
     _add_p1_piece(p)

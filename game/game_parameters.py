@@ -14,6 +14,7 @@ class GameParameters:
     For example: Connect Four is rows=6, cols=7, win_count=4,
     PlacementRule.COLUMN_STACK
     """
+
     size: BoardSize
     win_count: int
     placement_rule: PlacementRule

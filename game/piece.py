@@ -1,4 +1,3 @@
-
 from enum import Enum, auto
 
 
@@ -9,13 +8,12 @@ class PieceFormat(Enum):
 
 
 class Piece(Enum):
-    _ = auto() 
+    _ = auto()
     X = auto()
     O = auto()  # noqa: E741 (typographically ambiguous with zero, but thats okay)
 
-
     @classmethod
-    def selectable(cls) -> list['Piece']:
+    def selectable(cls) -> list["Piece"]:
         return [cls.X, cls.O]
 
     def _pretty_ascii_x_o(self) -> str:
@@ -59,7 +57,7 @@ class Piece(Enum):
         return "?"
 
     @classmethod
-    def from_str(cls, s: str) -> 'Piece':
+    def from_str(cls, s: str) -> "Piece":
         if s == "_":
             return cls._
         elif s == "X":
@@ -69,7 +67,7 @@ class Piece(Enum):
 
         raise ValueError(f"unknown piece: '{s}'")
 
-    def next(self) -> 'Piece':
+    def next(self) -> "Piece":
         """Returns the next piece in the sequence, i.e. X -> O"""
         if self == Piece.X:
             return Piece.O
@@ -77,4 +75,3 @@ class Piece(Enum):
             return Piece.X
 
         raise Exception("only X and O pieces are sequencable")
-

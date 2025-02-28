@@ -19,10 +19,11 @@ from game.piece import Piece
 from game.result import Result
 
 
-RE_METADATA_LINE = re.compile(r'\s*\[(\w+)\s+\"(.+)\"\]\s*')
+RE_METADATA_LINE = re.compile(r"\s*\[(\w+)\s+\"(.+)\"\]\s*")
+
 
 def _parse_metadata_line(obj: AT3Object, line: str):
-    if not line.endswith(']'):
+    if not line.endswith("]"):
         raise ParseException("meta line must end with ]")
 
     match = RE_METADATA_LINE.match(line)
@@ -108,15 +109,13 @@ def _parse_grid(obj: AT3Object, value: str) -> None:
     """
     Like 7x6 corresponding to 7 columns by 6 rows.
     """
-    if 'x' not in value:
-        raise ParseException(
-                f"'x' must be in grid field ({value=})")
+    if "x" not in value:
+        raise ParseException(f"'x' must be in grid field ({value=})")
 
     try:
-        cols, rows = map(int, value.split('x'))
+        cols, rows = map(int, value.split("x"))
     except ValueError:
-        raise ParseException(
-                f"grid values must be numbers ({value=})")
+        raise ParseException(f"grid values must be numbers ({value=})")
 
     obj.size = (rows, cols)
 
@@ -129,12 +128,10 @@ def _parse_win_count(obj: AT3Object, value: str) -> None:
     try:
         win_count = int(value)
     except ValueError:
-        raise ParseException(
-                f"win count must be a number ({value=})")
+        raise ParseException(f"win count must be a number ({value=})")
 
     if win_count <= 0:
-        raise ParseException(
-                f"win count must be greater than zero ({value=})")
+        raise ParseException(f"win count must be greater than zero ({value=})")
 
     obj.win_count = win_count
 
@@ -170,18 +167,17 @@ class Parser:
         """Ensure we're allowed to parse a move line"""
         self._check_player_choice_specified(obj)
 
-        allowed = [ParseState.INIT, ParseState.METADATA,
-                   ParseState.MOVE_NUMBER]
+        allowed = [ParseState.INIT, ParseState.METADATA, ParseState.MOVE_NUMBER]
         msg = "cannot parse moves in this state"
 
         self._check_state(allowed, msg)
 
     def _parse_move_number(self, token: str) -> int:
-        """Token is like '1.' """
-        if '.' not in token:
+        """Token is like '1.'"""
+        if "." not in token:
             raise ParseException(f"move number must have a '.' ({token=})")
 
-        move_num_str = token.replace('.', '')
+        move_num_str = token.replace(".", "")
 
         try:
             move_num = int(move_num_str)
@@ -196,8 +192,11 @@ class Parser:
     def _check_move_number_monotonic(self, move_num: int) -> None:
         prev_move_num = self.prev_move_num
         if (move_num - prev_move_num) != 1:
-            raise ParseException(f"move number must increase by 1 each time"
-                                 f" ({prev_move_num=} {move_num=})")
+            raise ParseException(
+                f"move number must increase by 1 each time"
+                f" ({prev_move_num=} {move_num=})"
+            )
+
     def _parse_move_line(self, obj: AT3Object, line: str) -> None:
         """
         1. a1 2. b2
@@ -244,7 +243,9 @@ class Parser:
         # The Board object is capable of parsing move coordinates, so rather
         # than reimplement that logic here, let's create a Board object and use
         # it
-        b = Board(size=obj.size, win_count=obj.win_count, placement_rule=obj.placement_rule)
+        b = Board(
+            size=obj.size, win_count=obj.win_count, placement_rule=obj.placement_rule
+        )
         self.game = Game(b)
         self.game.choose_player1_piece(obj.player1_piece)
 

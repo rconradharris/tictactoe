@@ -8,7 +8,7 @@ class Command(Enum):
     HELP = auto()
 
     @classmethod
-    def from_str(cls, s: str) -> 'Command':
+    def from_str(cls, s: str) -> "Command":
         if s == ".":
             return cls.SHOW_BOARD
         elif s == "?":

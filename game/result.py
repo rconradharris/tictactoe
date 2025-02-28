@@ -1,4 +1,3 @@
-
 from enum import Enum, auto
 
 
@@ -24,7 +23,7 @@ class Result(Enum):
         return "?"
 
     @classmethod
-    def from_str(cls, s: str) -> 'Result':
+    def from_str(cls, s: str) -> "Result":
         s = s.lower()
 
         if s == "undefined":

@@ -7,7 +7,7 @@ class FirstMove(Enum):
     ENGINE = auto()
 
     @classmethod
-    def all(cls) -> list['FirstMove']:
+    def all(cls) -> list["FirstMove"]:
         return [
             cls.COIN_TOSS,
             cls.HUMAN,
@@ -16,20 +16,20 @@ class FirstMove(Enum):
 
     def pretty(self) -> str:
         if self == FirstMove.COIN_TOSS:
-            return 'cointoss'
+            return "cointoss"
         elif self == FirstMove.HUMAN:
-            return 'human'
+            return "human"
         elif self == FirstMove.ENGINE:
-            return 'engine'
+            return "engine"
         return "?"
 
     @classmethod
-    def from_str(cls, s: str) -> 'FirstMove':
-        if s == 'cointoss':
+    def from_str(cls, s: str) -> "FirstMove":
+        if s == "cointoss":
             return cls.COIN_TOSS
-        elif s == 'human':
+        elif s == "human":
             return cls.HUMAN
-        elif s == 'engine':
+        elif s == "engine":
             return cls.ENGINE
         else:
-            raise ValueError('unknown first move')
+            raise ValueError("unknown first move")

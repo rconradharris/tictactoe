@@ -5,6 +5,7 @@ description = "Tic-Tac-Toe, Connect Four and variants"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "black>=25.1.0",
     "mypy>=1.15.0",
     "ruff>=0.9.7",
 ]

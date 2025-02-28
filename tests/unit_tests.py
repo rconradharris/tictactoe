@@ -7,11 +7,7 @@ from tests.assertions import assert_cells
 
 
 def test_top_empty_row():
-    b = Board(
-        size=(2, 2),
-        win_count=2,
-        placement_rule=PlacementRule.COLUMN_STACK
-    )
+    b = Board(size=(2, 2), win_count=2, placement_rule=PlacementRule.COLUMN_STACK)
 
     r = b.top_empty_row_for_column(0)
     assert r == 1
@@ -34,11 +30,7 @@ def test_playable_cells_column_stack():
         description="test_playable_cells_column_stack",
     )
 
-    b = Board(
-        size=(2, 2),
-        win_count=2,
-        placement_rule=PlacementRule.COLUMN_STACK
-    )
+    b = Board(size=(2, 2), win_count=2, placement_rule=PlacementRule.COLUMN_STACK)
 
     got = list(b.playable_cells())
     wanted = [(1, 0), (1, 1)]

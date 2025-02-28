@@ -12,18 +12,18 @@ def setup_logging(level):
 
 def add_global_args(parser):
     parser.add_argument(
-        '--debug',
-        action='store_true',
-        help='enable debug logging',
+        "--debug",
+        action="store_true",
+        help="enable debug logging",
     )
 
     # Verbosity is concerned with logging levels where as quietude is
     # concerned with how much output each subcommand chooses to display
     parser.add_argument(
-        '--quiet',
-        '-q',
-        action='store_true',
-        help='be more quiet than usual',
+        "--quiet",
+        "-q",
+        action="store_true",
+        help="be more quiet than usual",
     )
 
 
@@ -52,7 +52,7 @@ def main():
 
     # Dispatch to specific command handler
     args.func(args)
-    
+
 
 if __name__ == "__main__":
     main()

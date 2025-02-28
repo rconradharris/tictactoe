@@ -22,7 +22,8 @@ def _show_board(b: Board) -> None:
 
 
 def _show_help() -> None:
-    print("""\
+    print(
+        """\
 GAME CHOICES
     T3 - Tic Tac Toe
     C4 - Connect Four
@@ -33,7 +34,8 @@ COMMANDS
 
 MOVE SYNTAX
     T3: <column-letter><row-number> (ex: 'a1')
-    C4: <column-letter> (ex: 'a')""")
+    C4: <column-letter> (ex: 'a')"""
+    )
 
 
 def _handle_commands(b: Board, cmd_str: str) -> None:
@@ -85,10 +87,10 @@ def _pick_engine(g: Game, first_move: FirstMove, difficulty: int) -> Engine:
         p = Player.P2
     elif first_move == FirstMove.ENGINE:
         p = Player.P1
-    elif  first_move == FirstMove.COIN_TOSS:
+    elif first_move == FirstMove.COIN_TOSS:
         p = choice([Player.P1, Player.P2])
     else:
-        raise Exception('unknown first move value')
+        raise Exception("unknown first move value")
 
     if difficulty == 1:
         return Dummy(g, p)
@@ -139,12 +141,11 @@ def _game_loop(g: Game, eng: Engine) -> None:
 
 
 def start_loop(
-        game_choice: GameChoice = GameChoice.TIC_TAC_TOE,
-        difficulty: int = 5,
-        p1_piece: Piece = Piece.X,
-        first_move: FirstMove = FirstMove.COIN_TOSS,
-        ) -> None:
-
+    game_choice: GameChoice = GameChoice.TIC_TAC_TOE,
+    difficulty: int = 5,
+    p1_piece: Piece = Piece.X,
+    first_move: FirstMove = FirstMove.COIN_TOSS,
+) -> None:
     """
     :param game_choice: which game to play
     :param difficulty: how strong the engine is, a proxy for algorithm and

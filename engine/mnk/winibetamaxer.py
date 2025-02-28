@@ -9,6 +9,7 @@ class Winibetamaxer(Engine):
     """
     Like Winimax but use alphabeta rather than simple minimax
     """
+
     DEFAULT_PLIES = 7
 
     def generate_move(self) -> Move:

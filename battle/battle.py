@@ -11,14 +11,14 @@ from game.result import Result
 
 
 def do_battle(
-        game_choice: GameChoice = GameChoice.TIC_TAC_TOE,
-        num_games: int = 1,
-        p1_engine: EngineChoice = EngineChoice.DUMMY,
-        p1_plies: int | None = None,
-        p2_engine: EngineChoice = EngineChoice.WINIBETAMAXER,
-        p2_plies: int | None = None,
-        quiet: bool = False,
-        ):
+    game_choice: GameChoice = GameChoice.TIC_TAC_TOE,
+    num_games: int = 1,
+    p1_engine: EngineChoice = EngineChoice.DUMMY,
+    p1_plies: int | None = None,
+    p2_engine: EngineChoice = EngineChoice.WINIBETAMAXER,
+    p2_plies: int | None = None,
+    quiet: bool = False,
+):
     """Have two engines play each other
 
     :param num_games: number of times to do battle
@@ -35,12 +35,10 @@ def do_battle(
     eng_map: dict[Player, Engine] = {}
 
     p1_engine_cls = p1_engine.engine()
-    eng_map[Player.P1] = p1_engine_cls(
-            g, Player.P1, max_plies=p1_plies)
+    eng_map[Player.P1] = p1_engine_cls(g, Player.P1, max_plies=p1_plies)
 
     p2_engine_cls = p2_engine.engine()
-    eng_map[Player.P2] = p2_engine_cls(
-            g, Player.P2, max_plies=p2_plies)
+    eng_map[Player.P2] = p2_engine_cls(g, Player.P2, max_plies=p2_plies)
 
     result_stats: Counter = Counter()
 

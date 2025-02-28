@@ -16,6 +16,7 @@ class KnownField(Enum):
     """These are fields defined by the spec. Other fields can be included, but
     they'll just be treated as arbitrary strings
     """
+
     EVENT = auto()
     SITE = auto()
     DATE = auto()
@@ -32,7 +33,7 @@ class KnownField(Enum):
     PLAYER1_CHOICE = auto()
 
     @classmethod
-    def from_str(cls, field_name: str) -> 'KnownField':
+    def from_str(cls, field_name: str) -> "KnownField":
         s = field_name.lower()
 
         if s == "event":
@@ -64,5 +65,4 @@ class KnownField(Enum):
         elif s == "player1choice":
             return cls.PLAYER1_CHOICE
 
-        raise UnknownFieldException(
-                f"unknown field: '{field_name}'")
+        raise UnknownFieldException(f"unknown field: '{field_name}'")
