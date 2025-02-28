@@ -13,7 +13,7 @@ def _alphabeta(
     # Leaf (or hit depth stop)
     if depth == 0 or len(node.children) == 0:
         assert node.move is not None
-        score = fn(node.game, node.move, node.depth)
+        score = fn(node.game, node.move, depth)
         node.set_score(score)
         return score
 

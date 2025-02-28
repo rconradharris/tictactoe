@@ -37,3 +37,6 @@ class Move:
     def __repr__(self) -> str:
         """Provide a more concise repr than dataclass default"""
         return self.pretty()
+
+
+NULL_MOVE = Move((0, 0), Piece._)

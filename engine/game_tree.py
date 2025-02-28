@@ -1,10 +1,10 @@
 import logging
 from dataclasses import dataclass, field
 from collections.abc import Callable
-from typing import List, Optional, Tuple
+from typing import List
 
 from game.game import Game, GameState
-from game.move import Move
+from game.move import Move, NULL_MOVE
 from game.player import Player
 
 
@@ -12,7 +12,10 @@ logger = logging.getLogger(__name__)
 INFO = logger.info
 
 
+# This function evaluates the position after a given move
 type EvalFn = Callable[[Game, Move, int], float]
+
+# This function applies minimax (or a variant) to the game tree
 type MinimaxFn = Callable[[Node, int, bool, EvalFn], float]
 
 
@@ -30,69 +33,62 @@ def is_maximizer(p: Player) -> bool:
 class Node:
     """A game tree node for use in a minimax algorithm"""
 
-    tree: "GameTree" = field(repr=False)
     game: Game = field(repr=False)
-    move: Move | None = None
-    parent: Optional["Node"] = None
-    depth: int = 0
+    move: Move
+
     # Use None instead of 0.0 so we can easily detect if minimax didn't fill
     # the node in with a score
     score: float | None = None
 
     children: List["Node"] = field(default_factory=list, repr=True)
 
-    @property
-    def maximizer(self) -> bool:
+    def is_root(self) -> bool:
+        """Return True if this is a root node.
+
+        Root nodes are represent the current game state and have a null move
+        """
+        return self.move is NULL_MOVE
+
+    def is_maximizer(self) -> bool:
         return is_maximizer(self.game.cur_player)
 
     def pretty(self) -> str:
-        if self.move:
-            m = self.move.pretty()
-        else:
+        if self.move is NULL_MOVE:
             m = "ROOT"
+        else:
+            m = self.move.pretty()
         return f"{m} ({self.score:.3f})"
 
     def add_child(self, child: "Node") -> None:
         self.children.append(child)
-        self.tree.size += 1
 
     def set_score(self, score: float) -> None:
         self.score = score
-        self.tree.scored += 1
 
 
 @dataclass
 class GameTree:
     root: Node
 
-    # Number of nodes in the tree
-    size: int = 0
-
-    # The number of nodes that have been scored (i.e. visited)
-    # Reducing max_plies reduces the number of nodes visited
-    scored: int = 0
-
-    def __init__(self, g: Game) -> None:
-        self.root = Node(self, g.copy())
-        self.size += 1
-
     def build(self, max_plies: int) -> None:
         """Build out the subtree underneath the root"""
         _build_subtree(self.root, max_plies)
 
     def evaluate(self, max_plies: int, eFn: EvalFn, mFn: MinimaxFn) -> float:
-        """Place the evaluation minimaxer code in here"""
+        """Evaluate the game tree using minimax"""
         r = self.root
-        return mFn(r, max_plies, r.maximizer, eFn)
+        maximizer = r.is_maximizer()
+        return mFn(r, max_plies, maximizer, eFn)
 
-    def best_move(self) -> Tuple[Move, float]:
+    def best_move(self) -> Node:
+        """Return the node for the best move"""
         children = self.root.children
 
         scores = []
         for idx, child in enumerate(children):
             scores.append((child.score, idx))
 
-        if self.root.maximizer:
+        if self.root.is_maximizer():
             scores.sort(reverse=True)
         else:
             scores.sort()
@@ -103,10 +99,15 @@ class GameTree:
         pretty_scores = [children[idx].pretty() for _, idx in scores]
         INFO(f"best: {best_node.pretty()} {pretty_scores}")
 
-        assert best_node.move is not None
-        assert best_node.score is not None
+        return best_node
 
-        return (best_node.move, best_node.score)
+    @classmethod
+    def generate(cls, g: Game, max_plies: int) -> 'GameTree':
+        """Convenient factory function for building out a GameTree"""
+        root = Node(g.copy(), NULL_MOVE)
+        t = GameTree(root)
+        t.build(max_plies)
+        return t
 
 
 def _build_subtree(cur_node: Node, num_plies: int) -> None:
@@ -115,32 +116,29 @@ def _build_subtree(cur_node: Node, num_plies: int) -> None:
 
     g = cur_node.game
 
-    if cur_node.move:
-        assert cur_node.move.piece == g.cur_piece
+    is_root = cur_node.is_root()
 
-    if cur_node.move and g.state != GameState.FINISHED:
-        g.apply_move(cur_node.move)
+    if not is_root:
+        g_p = g.cur_piece
+        n_p = cur_node.move.piece
+        assert cur_node.move.piece == g.cur_piece, f"{n_p=} != {g_p=}"
+
+        if g.state != GameState.FINISHED:
+            g.apply_move(cur_node.move)
 
     if g.state == GameState.FINISHED:
         return
 
     p = g.cur_piece
 
-    if cur_node.move:
+    if not is_root:
         cur_node_piece = cur_node.move.piece
         assert p != cur_node.move.piece, f"{p=} should not equal {cur_node_piece=}"
 
     for cell in g.board.playable_cells():
         m = Move(cell, p)
 
-        child = Node(
-            tree=cur_node.tree,
-            game=g.copy(),
-            move=m,
-            parent=cur_node,
-            depth=cur_node.depth + 1,
-        )
-
+        child = Node(g.copy(), m)
         cur_node.add_child(child)
 
         _build_subtree(child, num_plies - 1)

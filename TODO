@@ -1,3 +1,34 @@
+- GameTree optimization
+    - We currently rebuild the game tree for each move, this is wasteful since it doesn't change
+    - When the move is played, create a new GameTree with the root at the chosen move's node
+
+
+    - remove size and scored attributes from tree, hard to keep in sync if we mutate the tree [DONE]
+    - Each node points to tree, when this changes this will be out of date
+
+    game.apply_move()
+    create a new GameTree with move node at root
+
+
+    - battle5
+        current: 0m48.041s
+
+
+- Add at3.format()
+    - Write game parameters and moves
+    - User can add additional metdata by editing the file
+- Add interactive command to write at3 file
+- better promising move heuristics
+- refutation tables
+- killer move?
+
+IDEAS
+=====
+- 3D tic-tac-toe
+
+DONE
+====
+
 - Use uv [DONE]
 - Use mypy typechecking [DONE]
 - Create board and game model [DONE]
@@ -23,13 +54,5 @@
 - Replace Cat Game with Draw since connect four is supported [DONE]
 - Add Board.reset(), call in Game.reset() [DONE]
 - Improve win scanning [DONE]
-- Add 'dummy' engine that plays random moves
-- Add at3.format()
-    - Write game parameters and moves
-    - User can add additional metdata by editing the file
-- Add interactive command to write at3 file
-- 3D tic-tac-toe
-- better promising move heuristics
-- alpha-beta pruning
-- refutation tables
-- killer move?
+- Add 'dummy' engine that plays random moves [DONE]
+- alpha-beta pruning [DONE]

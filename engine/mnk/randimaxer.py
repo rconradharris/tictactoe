@@ -13,15 +13,12 @@ class Randimaxer(Engine):
 
     def generate_move(self) -> Move:
         """Produce the next move"""
-        t = GameTree(self.game)
-
-        t.build(self.max_plies)
+        t = GameTree.generate(self.game, self.max_plies)
 
         eFn = eval_rand
         mFn = minimax
         t.evaluate(self.max_plies, eFn, mFn)
 
-        m, score = t.best_move()
+        n = t.best_move()
 
-        assert m is not None
-        return m
+        return n.move
