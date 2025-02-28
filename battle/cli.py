@@ -1,4 +1,5 @@
 from battle.battle import do_battle
+from engine.engine_choice import EngineChoice
 from game.game_choice import GameChoice
 
 
@@ -16,13 +17,47 @@ def _add_game_choice(parser) -> None:
         help='which game to play, tic-tac-toe or connect four',
     )
 
+def _add_engine_options(parser) -> None:
+    choices = [x.pretty() for x in EngineChoice]
+
+    # Player 1
+    parser.add_argument(
+        '--p1-engine',
+        default=EngineChoice.DUMMY.pretty(),
+        choices=choices,
+        help='which engine to use for player 1',
+    )
+    parser.add_argument(
+        '--p1-plies',
+        type=int,
+        help='how deep player 1 searches',
+    )
+
+    # Player 2
+    parser.add_argument(
+        '--p2-engine',
+        default=EngineChoice.WINIBETAMAXER.pretty(),
+        choices=choices,
+        help='which engine to use for player 2',
+    )
+    parser.add_argument(
+        '--p2-plies',
+        type=int,
+        help='how deep player 1 searches',
+    )
+
 
 def _battle(args) -> None:
-    choice = _parse_game_choice(args.game)
+    game_choice = _parse_game_choice(args.game)
+    p1_engine = EngineChoice.from_str(args.p1_engine)
+    p2_engine = EngineChoice.from_str(args.p2_engine)
+
     do_battle(
-        choice=choice,
+        game_choice=game_choice,
         num_games=args.num_games,
+        p1_engine=p1_engine,
         p1_plies=args.p1_plies,
+        p2_engine=p2_engine,
         p2_plies=args.p2_plies,
         quiet=args.quiet,
     )
@@ -45,13 +80,5 @@ def add_subparser(subparsers) -> None:
         default=1,
         help='number of times to do battle',
     )
-    p.add_argument(
-        '--p1-plies',
-        type=int,
-        help='how deep player 1 searches',
-    )
-    p.add_argument(
-        '--p2-plies',
-        type=int,
-        help='how deep player 1 searches',
-    )
+
+    _add_engine_options(p)

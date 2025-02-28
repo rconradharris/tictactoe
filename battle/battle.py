@@ -1,8 +1,7 @@
 from collections import Counter
 
 from engine.engine import Engine
-from engine.mnk.dummy import Dummy
-from engine.mnk.winibetamaxer import Winibetamaxer
+from engine.engine_choice import EngineChoice
 from game.board import Board
 from game.game import Game, GameState
 from game.game_choice import GameChoice
@@ -12,9 +11,11 @@ from game.result import Result
 
 
 def do_battle(
-        choice: GameChoice = GameChoice.TIC_TAC_TOE,
+        game_choice: GameChoice = GameChoice.TIC_TAC_TOE,
         num_games: int = 1,
+        p1_engine: EngineChoice = EngineChoice.DUMMY,
         p1_plies: int | None = None,
+        p2_engine: EngineChoice = EngineChoice.WINIBETAMAXER,
         p2_plies: int | None = None,
         quiet: bool = False,
         ):
@@ -26,19 +27,20 @@ def do_battle(
     :param quiet: just show stats at the end
     """
 
-    params = choice.parameters()
+    params = game_choice.parameters()
     assert params is not None
     b = Board.from_game_parameters(params)
     g = Game(b)
 
     eng_map: dict[Player, Engine] = {}
 
-    p1eng = Dummy(g, Player.P1)
-    eng_map[Player.P1] = p1eng
+    p1_engine_cls = p1_engine.engine()
+    eng_map[Player.P1] = p1_engine_cls(
+            g, Player.P1, max_plies=p1_plies)
 
-    #p2eng = Winimaxer(g, Player.P2, max_plies=p2_plies)
-    p2eng = Winibetamaxer(g, Player.P2, max_plies=p2_plies)
-    eng_map[Player.P2] = p2eng
+    p2_engine_cls = p2_engine.engine()
+    eng_map[Player.P2] = p2_engine_cls(
+            g, Player.P2, max_plies=p2_plies)
 
     result_stats: Counter = Counter()
 
