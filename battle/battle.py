@@ -2,7 +2,7 @@ from collections import Counter
 
 from engine.engine import Engine
 from engine.mnk.dummy import Dummy
-from engine.mnk.winimaxer import Winimaxer
+from engine.mnk.winibetamaxer import Winibetamaxer
 from game.board import Board
 from game.game import Game, GameState
 from game.game_choice import GameChoice
@@ -36,7 +36,8 @@ def do_battle(
     p1eng = Dummy(g, Player.P1)
     eng_map[Player.P1] = p1eng
 
-    p2eng = Winimaxer(g, Player.P2, max_plies=p2_plies)
+    #p2eng = Winimaxer(g, Player.P2, max_plies=p2_plies)
+    p2eng = Winibetamaxer(g, Player.P2, max_plies=p2_plies)
     eng_map[Player.P2] = p2eng
 
     result_stats: Counter = Counter()

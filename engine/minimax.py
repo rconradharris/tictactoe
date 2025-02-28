@@ -1,6 +1,6 @@
 import logging
 
-from engine.game_tree import EvalFn, GameTree, Node
+from engine.game_tree import EvalFn, Node
 
 
 logger = logging.getLogger(__name__)
@@ -39,10 +39,3 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
         minv = min(minv, minimax(child, depth - 1, True, fn))
     node.set_score(minv)
     return minv
-
-
-class MinimaxTree(GameTree):
-
-    def evaluate(self, max_plies: int, fn: EvalFn) -> None:
-        r = self.root
-        minimax(r, max_plies, r.maximizer, fn)

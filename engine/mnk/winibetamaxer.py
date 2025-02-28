@@ -1,15 +1,15 @@
+from engine.alphabeta import alphabeta
 from engine.engine import Engine
 from engine.game_tree import GameTree
-from engine.minimax import minimax
-from engine.mnk.heuristics import eval_rand
+from engine.mnk.heuristics import eval_end_state
 from game.move import Move
 
 
-class Randimaxer(Engine):
-    """Randimaxer is a game engine that uses the minimax algorithm to select
-    moves but is rather stupid in that it uses an evaluation function which
-    assigns a random score to each move.
+class Winibetamaxer(Engine):
     """
+    Like Winimax but use alphabeta rather than simple minimax
+    """
+    DEFAULT_PLIES = 7
 
     def generate_move(self) -> Move:
         """Produce the next move"""
@@ -17,8 +17,8 @@ class Randimaxer(Engine):
 
         t.build(self.max_plies)
 
-        eFn = eval_rand
-        mFn = minimax
+        eFn = eval_end_state
+        mFn = alphabeta
         t.evaluate(self.max_plies, eFn, mFn)
 
         m, score = t.best_move()

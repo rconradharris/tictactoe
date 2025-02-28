@@ -13,6 +13,7 @@ INFO = logger.info
 
 
 type EvalFn = Callable[[Game, Move, int], float]
+type MinimaxFn = Callable[[Node, int, bool, EvalFn], float]
 
 
 def is_maximizer(p: Player) -> bool:
@@ -78,9 +79,13 @@ class GameTree:
         """Build out the subtree underneath the root"""
         _build_subtree(self.root, max_plies)
 
-    def evaluate(self, max_plies: int, fn: EvalFn) -> None:
+    def evaluate(self,
+                 max_plies: int,
+                 eFn: EvalFn,
+                 mFn: MinimaxFn) -> float:
         """Place the evaluation minimaxer code in here"""
-        raise NotImplementedError
+        r = self.root
+        return mFn(r, max_plies, r.maximizer, eFn)
 
     def best_move(self) -> Tuple[Move, float]:
         children = self.root.children
