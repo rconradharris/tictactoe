@@ -1,22 +1,27 @@
+import logging
 from random import uniform
 
 from engine.game_tree import Node
 from game.game import GameState
 from game.result import Result
 
+logger = logging.getLogger(__name__)
+DEBUG = logger.debug
 
-def depth_penalty(depth: int, penalty=0.01) -> float:
+
+def depth_penalty(depth: int, maximizer: bool, penalty=0.01) -> float:
     """
     How much each ply reduces the score, i.e. the sooner the win, the better
     """
-    return penalty * (depth - 1)
+    magnitude = penalty * (depth - 1)
+    return -magnitude if maximizer else magnitude
 
 
 def score_result(r: Result, victory=1.0) -> float:
     if r == Result.PLAYER1_VICTORY:
         return victory
     elif r == Result.PLAYER2_VICTORY:
-        return victory
+        return -victory
     elif r == Result.DRAW:
         return 0.0
     else:
@@ -30,10 +35,7 @@ def eval_end_state(cur_node: Node, depth: int, maximizer: bool) -> float:
 
     score = 0.0
     score += score_result(g.result)
-    score -= depth_penalty(depth)
-
-    if not maximizer:
-        score = -score
+    score += depth_penalty(depth, maximizer)
 
     return score
 
