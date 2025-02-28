@@ -26,6 +26,7 @@ class GameEvent(Enum):
     """These are events that game engines can listen for to adjust their
     internal state
     """
+
     MOVE = auto()
     RESET = auto()
 

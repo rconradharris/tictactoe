@@ -14,8 +14,8 @@ INFO = logger.info
 
 # This function evaluates the position after a given move
 #
-# fn(game, move, depth) -> score
-type EvalFn = Callable[[Game, Move, int], float]
+# fn(node, depth, maximizer) -> score
+type EvalFn = Callable[[Node, int, bool], float]
 
 # This function applies minimax (or a variant) to the game tree
 #
@@ -28,16 +28,6 @@ type MinimaxFn = Callable[[Node, int, bool, EvalFn], float]
 #
 # fn(game) -> Gen(Move, ...)
 type MoveGenFn = Callable[[Game], Generator[Move]]
-
-
-def is_maximizer(p: Player) -> bool:
-    """Player 1 is always the maximizer
-
-    +1.0 is an immediate player 1 victory
-    -1.0 is an immediate player 2 victory
-     0.0 is an immediate draw
-    """
-    return p == Player.P1
 
 
 @dataclass
@@ -61,7 +51,14 @@ class Node:
         return self.move is NULL_MOVE
 
     def is_maximizer(self) -> bool:
-        return is_maximizer(self.game.cur_player)
+        """Player 1 is always the maximizer
+
+        > 0.0 player 1 advantage
+        < 0.0 player 2 advantage
+        = 0.0 is draw-ish
+        """
+        g = self.game
+        return g.cur_player == Player.P1
 
     def pretty(self) -> str:
         if self.move is NULL_MOVE:

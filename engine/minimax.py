@@ -21,7 +21,7 @@ def minimax(node: Node, depth: int, maximizer: bool, fn: EvalFn) -> float:
     # Leaf (or hit depth stop)
     if depth == 0 or len(node.children) == 0:
         assert node.move is not None
-        score = fn(node.game, node.move, depth)
+        score = fn(node, depth, maximizer)
         node.set_score(score)
         return score
 
