@@ -1,19 +1,11 @@
 - GameTree optimization
     - We currently rebuild the game tree for each move, this is wasteful since it doesn't change
     - When the move is played, create a new GameTree with the root at the chosen move's node
-
-
     - remove size and scored attributes from tree, hard to keep in sync if we mutate the tree [DONE]
-    - Each node points to tree, when this changes this will be out of date
-
-    game.apply_move()
-    create a new GameTree with move node at root
-
+    - add move applied listener so engine knows when a move was made and can update GameTree accordingly [DONE]
 
     - battle5
         current: 0m48.041s
-
-
 - Add at3.format()
     - Write game parameters and moves
     - User can add additional metdata by editing the file

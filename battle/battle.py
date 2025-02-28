@@ -1,6 +1,6 @@
 from collections import Counter
 
-from engine.engine import Engine
+from engine.engine import Engine, create_engine
 from engine.engine_choice import EngineChoice
 from game.board import Board
 from game.game import Game, GameState
@@ -34,11 +34,17 @@ def do_battle(
 
     eng_map: dict[Player, Engine] = {}
 
-    p1_engine_cls = p1_engine.engine()
-    eng_map[Player.P1] = p1_engine_cls(g, Player.P1, max_plies=p1_plies)
+    p1_eng_cls = p1_engine.engine()
 
-    p2_engine_cls = p2_engine.engine()
-    eng_map[Player.P2] = p2_engine_cls(g, Player.P2, max_plies=p2_plies)
+    p1_eng = create_engine(p1_eng_cls, g, Player.P1, max_plies=p1_plies)
+
+    eng_map[Player.P1] = p1_eng
+
+    p2_eng_cls = p2_engine.engine()
+
+    p2_eng = create_engine(p2_eng_cls, g, Player.P2, max_plies=p2_plies)
+
+    eng_map[Player.P2] = p2_eng
 
     result_stats: Counter = Counter()
 
@@ -50,7 +56,8 @@ def do_battle(
         # Play until each game is done
         while g.state != GameState.FINISHED:
             eng = eng_map[g.cur_player]
-            m = eng.generate_move()
+
+            m = eng.propose_move()
 
             g.apply_move(m)
 

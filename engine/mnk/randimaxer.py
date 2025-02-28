@@ -12,7 +12,7 @@ class Randimaxer(Engine):
     assigns a random score to each move.
     """
 
-    def generate_move(self) -> Move:
+    def propose_move(self) -> Move:
         """Produce the next move"""
         gFn = generate_moves
         t = GameTree.generate(self.game, self.max_plies, gFn)

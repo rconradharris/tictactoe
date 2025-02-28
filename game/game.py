@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from enum import Enum, auto
 from typing import Generator
 
@@ -14,6 +15,9 @@ from game.piece import Piece
 from game.result import Result
 
 
+type NotifyMoveFn = Callable[[Move], None]
+
+
 class GameState(Enum):
     INIT = auto()
     PIECES_CHOSEN = auto()
@@ -28,6 +32,7 @@ class Game:
 
     def __init__(self, board: Board):
         self.board: Board = board
+        self._move_listeners: list[NotifyMoveFn] = []
         self.reset()
 
     def winner(self) -> Player | None:
@@ -145,6 +150,8 @@ class Game:
 
         self._adjust_game_state_post_move()
 
+        self._notify_move_listeners(m)
+
         if self.state == GameState.PLAYING:
             self._end_turn()
 
@@ -182,6 +189,21 @@ class Game:
         g2.board = g1.board.copy()
 
         return g2
+
+    def add_move_listener(self, fn: NotifyMoveFn) -> None:
+        """Add a callback for when a move is made
+
+        An Engine will use this to update its internal state when a move is
+        officially recorded in the books.
+        """
+        self._move_listeners.append(fn)
+
+    def remove_move_listener(self, fn: NotifyMoveFn) -> None:
+        self._move_listeners.remove(fn)
+
+    def _notify_move_listeners(self, m: Move) -> None:
+        for fn in self._move_listeners:
+            fn(m)
 
 
 def generate_moves(g: Game) -> Generator[Move]:

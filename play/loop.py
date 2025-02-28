@@ -1,6 +1,6 @@
 from random import choice
 
-from engine.engine import Engine
+from engine.engine import Engine, create_engine
 from engine.mnk.dummy import Dummy
 from engine.mnk.winimaxer import Winimaxer
 from game.board import Board
@@ -93,10 +93,10 @@ def _pick_engine(g: Game, first_move: FirstMove, difficulty: int) -> Engine:
         raise Exception("unknown first move value")
 
     if difficulty == 1:
-        return Dummy(g, p)
+        return create_engine(Dummy, g, p)
 
     max_plies = difficulty - 1
-    return Winimaxer(g, p, max_plies=max_plies)
+    return create_engine(Winimaxer, g, p, max_plies=max_plies)
 
 
 def _print_result(g: Game, eng: Engine) -> None:
@@ -121,7 +121,7 @@ def _game_loop(g: Game, eng: Engine) -> None:
             break
 
         if eng.player == g.cur_player:
-            move = eng.generate_move()
+            move = eng.propose_move()
         else:
             try:
                 move = _input_move(g)
